@@ -1,0 +1,14 @@
+{
+  "name": "ray-tracing-ts-server",
+  "version": "1.0.0",
+  "module": "src/index.js",
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "scripts": {
+    "start": "bun run src/index.ts"
+  },
+  "dependencies": {
+    "ws": "^8.8.1"
+  }
+}
