@@ -26,7 +26,7 @@ export class Renderer
                 ];
 
                 const color : RGBA = this._perPixel(coord);
-                this._image[x + y * this._image.width] = color;
+                this._image.setDataValue(x + y * this._image.width, color);
             }
         }
 
@@ -41,7 +41,7 @@ export class Renderer
         const sphereRadius = 0.5;
 
         // quadratic equation coefficients
-        const a = dot3D(rayDirection, rayOrigin);
+        const a = dot3D(rayDirection, rayDirection);
         const b = 2 * dot3D(rayOrigin, rayDirection);
         const c = dot3D(rayOrigin, rayOrigin) - sphereRadius * sphereRadius;
         const discriminant = (b * b) - (4 * a * c);
@@ -68,7 +68,7 @@ export class Renderer
             0
         );
 
-        const sphereBaseColour : RGB = [0, 1, 0];
+        const sphereBaseColour : RGB = [1, 0, 0.5];
         const sphereColour : RGBA = [ ...multiply3D(sphereBaseColour, lightIntensity), 1];
         return sphereColour
     }
