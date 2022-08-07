@@ -10,7 +10,9 @@
     "build": "tsc",
     "start": "bun start:node",
     "start:node": "tsc && node ./build/index.js",
-    "start:bun": "bun run src/index.ts"
+    "start:bun": "bun run src/index.ts",
+    "benchmark:bun": "bun run ./src/benchmark.ts",
+    "benchmark:node": "bun build && node ./build/benchmark.js"
   },
   "dependencies": {
     "ws": "^8.8.1"
