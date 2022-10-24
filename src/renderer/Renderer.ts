@@ -32,13 +32,16 @@ export class Renderer implements IRenderer
 
         for(let y = 0; y < this._finalImage.height; y++)
         {
+            // flipped because Canvas is from top-left corner,
+            // instead of bottom-left.
+            const yFlipped = (this._finalImage.height - 1) - y;
             for(let x = 0; x < this._finalImage.width; x++)
             {
                 const index = x + (y * this._finalImage.width);
                 const coord: vector2.Vector2 = [
                     // normalise
                     x / this._finalImage.width,
-                    y / this._finalImage.height
+                    yFlipped / this._finalImage.height
                 ];
                 coord[0] = (coord[0] * 2) -1; // -1 -> 1
                 coord[1] = (coord[1] * 2) -1; // -1 -> 1

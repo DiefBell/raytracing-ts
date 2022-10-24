@@ -6,8 +6,8 @@ Seraph.initialize();
 
 // create a canvas display, this is our canvas/window
 const display = new CanvasDisplay(
-    480,
-    480,
+    720,
+    720,
     "Ray Tracing TS"
 );
 
