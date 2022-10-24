@@ -28,7 +28,7 @@ export const renderLoop = (display: CanvasDisplay) =>
         display.pollEvents();
 
         const render = renderer.render();
-        console.info(`\nRender completed in ${ render.time.toFixed(2) } ms.`);
+        console.info(`\nRender completed in \x1b[1m\x1b[31m${ render.time.toFixed(2) } ms\x1b[0m.`);
 
         context.putImageData(render.imageData, 0, 0);
 
@@ -38,9 +38,9 @@ export const renderLoop = (display: CanvasDisplay) =>
         const currTime = performance.now();
         const renderLoopTime = currTime - timer;
         timer = currTime;
-        console.log(`Full render loop done in ${ renderLoopTime.toFixed(2) } ms.`);
+        console.log(`Full render loop done in \x1b[1m\x1b[32m${ renderLoopTime.toFixed(2) } ms\x1b[0m.`);
 
         const additionalLatency = renderLoopTime - render.time;
-        console.log(`Additional ${ additionalLatency.toFixed(2) } ms of latency displaying to canvas.`);
+        console.log(`Additional \x1b[1m\x1b[33m${ additionalLatency.toFixed(2) } ms\x1b[0m of latency displaying to canvas.`);
     }
 }
