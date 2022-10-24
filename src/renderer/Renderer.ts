@@ -1,19 +1,12 @@
-import { ELEMENTS_PER_RGBA, Rgb255, Rgba255 } from "../colour/colour";
+import type { Rgb255, Rgba255 } from "../colour/colour";
 import { RawImageData } from "../rawImageData/RawImageData";
 import { vector2, vector3 } from "../vector";
+import { IRenderer } from "./IRenderer";
+import type { IRenderInfo } from "./IRenderInfo";
 
-interface IRenderInfo
-{
-    // Render time in ms
-    time: number;
-
-    imageData: ImageData;
-}
-
-export class Renderer
+export class Renderer implements IRenderer
 {
     private _finalImage: RawImageData;
-    // private _imageData: RGBA[];
 
     constructor(initialWidth: number, initialHeight: number)
     {
