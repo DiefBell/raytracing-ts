@@ -40,7 +40,5 @@ export class RawImageData
     {
         const imageBuffer = new ArrayBuffer(width * height * ELEMENTS_PER_RGBA * BYTES_PER_UINT8)
         this._data = new Uint8ClampedArray(imageBuffer);
-        console.log(`Resized image data to ${this._data.length}`);
-        this._data.fill(1);
     }
 }
