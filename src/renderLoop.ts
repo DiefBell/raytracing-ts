@@ -9,7 +9,8 @@ export const renderLoop = (display: CanvasDisplay) =>
 
     display.on(
         "resize",
-        (width, height) => {
+        (width, height) => 
+{
             console.log(`Window resized to ${width} x ${height}.`);
             renderer.onResize(width, height);
             // we need to get a new context everytime the window resizes
@@ -22,11 +23,11 @@ export const renderLoop = (display: CanvasDisplay) =>
 
     let timer = performance.now();
 
-    const AVERAGE_MAX = 1000;
-    let avgCounter = 0;
-    let avgRenderTime = 0;
-    let avgRenderLoopTime = 0;
-    let avgLatency = 0;
+    // const AVERAGE_MAX = 1000;
+    // const avgCounter = 0;
+    // const avgRenderTime = 0;
+    // const avgRenderLoopTime = 0;
+    // const avgLatency = 0;
 
     while(!display.shouldClose())
     {
