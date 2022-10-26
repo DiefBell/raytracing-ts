@@ -16,7 +16,7 @@ const isMatrix = (m: number[][]) =>
 
 const arraysHaveSameLength = (a: unknown[], b: unknown[]) => a.length === b.length;
 
-const dot = (a: number[], b: number[]) =>
+export const dot = (a: number[], b: number[]) =>
 {
     if(!arraysHaveSameLength(a, b))
         throw new Error("Cannot dot product arrays of different length");
