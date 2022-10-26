@@ -13,6 +13,7 @@ module.exports = {
 		"@typescript-eslint",
 	],
     extends: [
+		"eslint:recommended",
         "plugin:@typescript-eslint/recommended"
     ],
     rules: {
@@ -21,6 +22,8 @@ module.exports = {
         "@typescript-eslint/no-empty-interface": "off",
         "@typescript-eslint/no-empty-function": "off",
 		"brace-style": "off",
-		"@typescript-eslint/brace-style": [ "error", "allman", { "allowSingleLine": true } ]
+		"@typescript-eslint/brace-style": [ "error", "allman", { "allowSingleLine": true } ],
+		"semi": "error",
+		"eol-last": "error"
     }
 };
