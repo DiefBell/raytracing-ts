@@ -8,7 +8,7 @@
     "lint:fix": "eslint ./src --fix",
     "start": "ts-node ./src/index.ts",
     "benchmark": "ts-node ./src/benchmark.ts",
-    "test": "jest --config ./.jestrc.js"
+    "test": "jest"
   },
   "devDependencies": {
     "@types/node": "^18.11.4",
