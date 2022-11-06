@@ -1,6 +1,6 @@
 import type { Rgb255, Rgba255 } from "../colour/colour";
 import { RawImageData } from "../rawImageData/RawImageData";
-import { vector2, vector3 } from "../vector";
+import { vector2, vector3 } from "../maths/vector";
 import { IRenderer } from "./IRenderer";
 import type { IRenderInfo } from "./IRenderInfo";
 
@@ -65,7 +65,7 @@ export class Renderer implements IRenderer
     private perPixel(coord: vector2.Vector2): Rgba255
     {
         const SPHERE_COLOUR: Rgb255 = [ 255, 0, 255 ];
-        const BG_COLOUR: Rgba255 = [ 0, 0, 0, 255]
+        const BG_COLOUR: Rgba255 = [ 0, 0, 0, 255];
 
         const rayOrigin: vector3.Vector3 = [ 0, 0, 1 ];
         const rayDirection: vector3.Vector3 = [ coord[0], coord[1], -1 ];
@@ -75,7 +75,7 @@ export class Renderer implements IRenderer
         const b = 2 * vector3.dot(rayOrigin, rayDirection);
         const c = vector3.dot(rayOrigin, rayOrigin) - sphereRadius * sphereRadius;
 
-        const discriminant = (b * b) - (4 * a * c)
+        const discriminant = (b * b) - (4 * a * c);
         if(discriminant < 0)
         {
             return BG_COLOUR;
@@ -107,7 +107,7 @@ export class Renderer implements IRenderer
 
         const lightIntensity = vector3.dot(normal, vector3.scale(lightDir, -1 ));
 
-        const colourRgb = vector3.scale(SPHERE_COLOUR, lightIntensity);
+        const colourRgb = vector3.scale(SPHERE_COLOUR, lightIntensity) as Rgb255;
 
         return [ ...colourRgb, 255];
     }
