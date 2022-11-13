@@ -19,6 +19,6 @@
     "typescript-eslint": "^0.0.1-alpha.0"
   },
   "dependencies": {
-    "@minecraftts/seraph": "^0.2.0"
+    "@minecraftts/seraph": "^0.4.0"
   }
 }

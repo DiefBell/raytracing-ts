@@ -76,10 +76,10 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
-"@minecraftts/buffered-image@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@minecraftts/buffered-image/-/buffered-image-1.0.0.tgz#de554cf453eee4c947759f1186e2b0ff20474975"
-  integrity sha512-DsDEiOLcxsBe86K06xJT8h1S2zNbJr0M0NbRUwUV9tW0El8ZDRtAAfzKbV8DiY/3uVAQzVJ+7xYSx738N7oILQ==
+"@minecraftts/buffered-image@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@minecraftts/buffered-image/-/buffered-image-1.1.0.tgz#d1a8196043036b3ac533d23ab4cf30c4ed2ae5c9"
+  integrity sha512-UE3rMQY8ihxp2W4cCMusK20LWG4tjlhyuNf2qQqQDZsAdoMzFKvkojRBeox6eiKESQGlP/pge9KzagCC81bqVQ==
   dependencies:
     canvas "^2.10.1"
 
@@ -93,20 +93,20 @@
     node-addon-api "^5.0.0"
 
 "@minecraftts/opengl@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@minecraftts/opengl/-/opengl-2.0.1.tgz#cfcf9a56fadcb3e1cce140b5bd83cbeca159efd2"
-  integrity sha512-TBKfMYsxQj0QlCmQTlhAs6/GvLz8rwtOWQnX0yO7wUx+rEmd33smBIfT/TNlGoq73yUPZlt9IBxkzqWWRJat+A==
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@minecraftts/opengl/-/opengl-2.1.1.tgz#04acd619e3f3ecf28c22d490efe5e003839445b7"
+  integrity sha512-FS8W/eMIKQ8Kv8624zFI1PmwzZm4omAuFcuHcuhpZ0EPcm1rMKQZGU0aCey67VcRp9Fc+8QnEd+AW7s6RImtXw==
   dependencies:
     bindings "^1.5.0"
     cmake-js "^6.3.2"
     node-addon-api "^5.0.0"
 
-"@minecraftts/seraph@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@minecraftts/seraph/-/seraph-0.2.0.tgz#90dcb19afa8316864e608b6b9e27cb958c93de59"
-  integrity sha512-afoMIt25vlXR09NoqdRXBbOAO1rGPxXlrTaRxdbnCH3E2qpvXZwEBzqcoQPgxnye6n7qhxnMQUSf+pmtogZl7Q==
+"@minecraftts/seraph@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@minecraftts/seraph/-/seraph-0.4.0.tgz#8978abae0270223bf95c458f192b73be5b2a0152"
+  integrity sha512-FIQLzzjNIT/fWcNGCWb4BjIPD88tuJM/QZV+Rk3hKiRh2pVmYLkugAczjQhwUjECOJxfzqdPTY27Q2cXz1MJ2g==
   dependencies:
-    "@minecraftts/buffered-image" "^1.0.0"
+    "@minecraftts/buffered-image" "^1.1.0"
     "@minecraftts/glfw" "^2.0.1"
     "@minecraftts/opengl" "^2.0.1"
     canvas "^2.10.1"
@@ -434,12 +434,12 @@ camelcase@^2.0.1:
   integrity sha512-DLIsRzJVBQu72meAKPkWQOLcujdXT32hwdfnkI1frSiSRMK1MofjKHf+MEx0SB6fjEFXL8fBDv1dKymBlOp4Qw==
 
 canvas@^2.10.1:
-  version "2.10.1"
-  resolved "https://registry.yarnpkg.com/canvas/-/canvas-2.10.1.tgz#fbfd4b1b3b106c3454481d79d363ebadf8811c08"
-  integrity sha512-29pIjn9uwTUsIgJUNd7GXxKk8sg4iyJwLm1wIilNIqX1mVzXSc2nUij9exW1LqNpis1d2ebMYfMqTWcokZ4pdA==
+  version "2.10.2"
+  resolved "https://registry.yarnpkg.com/canvas/-/canvas-2.10.2.tgz#66d827e24acd6c34667453728e13d337417d4b20"
+  integrity sha512-FSmlsip0nZ0U4Zcfht0qBJqDhlfGuevTZKE8h+dBOYrJjGvY3iqMGSzzbvkaFhvMXiVxfcMaPHS/kge++T5SKg==
   dependencies:
     "@mapbox/node-pre-gyp" "^1.0.0"
-    nan "^2.15.0"
+    nan "^2.17.0"
     simple-get "^3.0.3"
 
 chainsaw@~0.1.0:
@@ -1239,7 +1239,7 @@ ms@2.1.2:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
-nan@^2.15.0:
+nan@^2.17.0:
   version "2.17.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.17.0.tgz#c0150a2368a182f033e9aa5195ec76ea41a199cb"
   integrity sha512-2ZTgtl0nJsO0KQCjEpxcIr5D+Yv90plTitZt9JBfQvVJDS5seMl3FOvsh3+9CoYWXf/1l5OaZzzF6nDm4cagaQ==
@@ -1652,9 +1652,9 @@ tar@^4:
     yallist "^3.1.1"
 
 tar@^6.1.11:
-  version "6.1.11"
-  resolved "https://registry.yarnpkg.com/tar/-/tar-6.1.11.tgz#6760a38f003afa1b2ffd0ffe9e9abbd0eab3d621"
-  integrity sha512-an/KZQzQUkZCkuoAA64hM92X0Urb6VpRhAFllDzz44U2mcD5scmT3zBc4VgVpkugF580+DQn8eAFSyoQt0tznA==
+  version "6.1.12"
+  resolved "https://registry.yarnpkg.com/tar/-/tar-6.1.12.tgz#3b742fb05669b55671fb769ab67a7791ea1a62e6"
+  integrity sha512-jU4TdemS31uABHd+Lt5WEYJuzn+TJTCBLljvIAHZOz6M9Os5pJ4dD+vRFLxPa/n3T0iEFzpi+0x1UfuDZYbRMw==
   dependencies:
     chownr "^2.0.0"
     fs-minipass "^2.0.0"
@@ -1710,9 +1710,9 @@ tslib@^1.8.1:
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
 tslib@^2.1.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.0.tgz#7cecaa7f073ce680a05847aa77be941098f36dc3"
-  integrity sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.1.tgz#0d0bfbaac2880b91e22df0768e55be9753a5b17e"
+  integrity sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==
 
 tsutils@^3.21.0:
   version "3.21.0"
