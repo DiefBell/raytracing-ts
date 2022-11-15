@@ -1,19 +1,21 @@
-import type { Rgb255, Rgba255 } from "../colour/colour";
+import { vector } from "glm-ts";
+import { ICamera } from "../camera/ICamera";
+import { $clampRgba255, Rgb255, Rgba255 } from "../colour/colour";
 import { RawImageData } from "../rawImageData/RawImageData";
-import { vector2, vector3 } from "../maths/vector";
+import { IRay } from "./IRay";
 import { IRenderer } from "./IRenderer";
 import type { IRenderInfo } from "./IRenderInfo";
 
 export class Renderer implements IRenderer
 {
-    private _finalImage: RawImageData;
+    private _finalImage : RawImageData;
 
-    constructor(initialWidth: number, initialHeight: number)
+    constructor(initialWidth : number, initialHeight : number)
     {
         this._finalImage = new RawImageData(initialWidth, initialHeight);
     }
 
-    public onResize(width: number, height: number) : void
+    public onResize(width : number, height : number) : void
     {
         if(this._finalImage !== null)
         {
@@ -26,27 +28,29 @@ export class Renderer implements IRenderer
         }
     }
 
-    public render(): IRenderInfo
+    public render(camera: ICamera) : IRenderInfo
     {
         const startTime = performance.now();
+
+        let ray: IRay;
 
         for(let y = 0; y < this._finalImage.height; y++)
         {
             // flipped because Canvas is from top-left corner,
             // instead of bottom-left.
-            const yFlipped = (this._finalImage.height - 1) - y;
+            // const yFlipped = (this._finalImage.height - 1) - y; // need this in camera
             for(let x = 0; x < this._finalImage.width; x++)
             {
                 const index = x + (y * this._finalImage.width);
-                const coord: vector2.Vector2 = [
-                    // normalise
-                    x / this._finalImage.width,
-                    yFlipped / this._finalImage.height
-                ];
-                coord[0] = (coord[0] * 2) -1; // -1 -> 1
-                coord[1] = (coord[1] * 2) -1; // -1 -> 1
 
-                const colour = this.perPixel(coord);
+                ray = {
+                    origin: camera.position,
+                    direction: camera.rayDirections[index]
+                };
+
+                const colour: Rgba255 = this._traceRay(ray);
+                $clampRgba255(colour);
+
                 this._finalImage.setDataValue(
                     colour,
                     index
@@ -55,25 +59,21 @@ export class Renderer implements IRenderer
 
         }
 
-        const endTime = performance.now();
         return {
-            time: endTime - startTime,
+            time: performance.now() - startTime,
             imageData: this._finalImage.getImageData()
         };
     }
 
-    private perPixel(coord: vector2.Vector2): Rgba255
+    private _traceRay(ray: IRay) : Rgba255
     {
-        const SPHERE_COLOUR: Rgb255 = [ 255, 0, 255 ];
-        const BG_COLOUR: Rgba255 = [ 0, 0, 0, 255];
-
-        const rayOrigin: vector3.Vector3 = [ 0, 0, 1 ];
-        const rayDirection: vector3.Vector3 = [ coord[0], coord[1], -1 ];
+        const SPHERE_COLOUR : Rgb255 = [ 255, 0, 255 ];
+        const BG_COLOUR : Rgba255 = [ 0, 0, 0, 255];
         const sphereRadius = 0.5;
 
-        const a = vector3.dot(rayDirection, rayDirection);
-        const b = 2 * vector3.dot(rayOrigin, rayDirection);
-        const c = vector3.dot(rayOrigin, rayOrigin) - sphereRadius * sphereRadius;
+        const a = vector.dot(ray.direction, ray.direction);
+        const b = 2 * vector.dot(ray.origin, ray.direction);
+        const c = vector.dot(ray.origin, ray.origin) - sphereRadius * sphereRadius;
 
         const discriminant = (b * b) - (4 * a * c);
         if(discriminant < 0)
@@ -94,20 +94,20 @@ export class Renderer implements IRenderer
         //     t1
         // );
 
-        const hitPoint = vector3.add(
+        const hitPoint = vector.add(
             // full ray from ray origin to hit point
-            vector3.scale(rayDirection, tClosest),
+            vector.scale(ray.direction, tClosest),
             // add origin point to get absolute hit point location
-            rayOrigin
+            ray.origin
         );
 
-        const normal = vector3.unit(hitPoint);
+        const normal = vector.normalise(hitPoint);
 
-        const lightDir: vector3.Vector3 = vector3.unit([ -1, -1, -1 ]);
+        const lightDir : vector.Vector3 = vector.normalise([ -1, -1, -1 ]);
 
-        const lightIntensity = vector3.dot(normal, vector3.scale(lightDir, -1 ));
+        const lightIntensity = vector.dot(normal, vector.scale(lightDir, -1 ));
 
-        const colourRgb = vector3.scale(SPHERE_COLOUR, lightIntensity) as Rgb255;
+        const colourRgb = vector.scale(SPHERE_COLOUR, lightIntensity) as Rgb255;
 
         return [ ...colourRgb, 255];
     }

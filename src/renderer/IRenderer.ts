@@ -1,7 +1,8 @@
+import { ICamera } from "../camera/ICamera";
 import type { IRenderInfo } from "./IRenderInfo";
 
 export interface IRenderer
 {
-    onResize: (width: number, height: number) => void;
-    render: () => IRenderInfo;
+    onResize : (width : number, height : number) => void;
+    render : (camera: ICamera) => IRenderInfo;
 }
