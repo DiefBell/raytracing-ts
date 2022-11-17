@@ -249,6 +249,9 @@ export class Camera implements ICamera
 
         for(let y = 0; y < this._viewportHeight; y++)
         {
+            // Canvas is indexed from top-left but
+            // we want to index from bottom-left
+            const yInverted = (this._viewportWidth - y) - 1;
             for(let x = 0; x < this._viewportWidth; x++)
             {
                 let coord: vector.Vector2 = [ x / this._viewportWidth, y / this._viewportHeight ];
@@ -282,8 +285,7 @@ export class Camera implements ICamera
                 )
                 .slice(0, 3) as vector.Vector3;
 
-                const yInverted = this._viewportWidth - y;
-                this._rayDirections[ x + y * this._viewportWidth] = rayDirection;
+                this._rayDirections[ x + yInverted * this._viewportWidth] = rayDirection;
             }
         }
     }
