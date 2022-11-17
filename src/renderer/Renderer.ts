@@ -61,11 +61,6 @@ export class Renderer implements IRenderer
                     direction: camera.rayDirections[index]
                     // direction: [ coord[0], coord[1], -1 ]
                 };
-
-                if(x === 360 && y === 360)
-                {
-                    console.log("Ray dir at middle:", ray.direction);
-                }
                 
                 const colour: Rgba255 = this._traceRay(ray);
                 $clampRgba255(colour);
