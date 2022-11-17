@@ -38,16 +38,35 @@ export class Renderer implements IRenderer
         {
             // flipped because Canvas is from top-left corner,
             // instead of bottom-left.
-            // const yFlipped = (this._finalImage.height - 1) - y; // need this in camera
+            const yFlipped = (this._finalImage.height - 1) - y; // TODO: need this in camera
             for(let x = 0; x < this._finalImage.width; x++)
             {
                 const index = x + (y * this._finalImage.width);
+                const coord : vector.Vector2 = [
+                    // normalise
+                    x / this._finalImage.width,
+                    yFlipped / this._finalImage.height
+                ];
+                coord[0] = (coord[0] * 2) -1; // -1 -> 1
+                coord[1] = (coord[1] * 2) -1; // -1 -> 1
+
+                // const colour = this.perPixel(coord);
+                // this._finalImage.setDataValue(
+                //     colour,
+                //     index
+                // );
 
                 ray = {
                     origin: camera.position,
                     direction: camera.rayDirections[index]
+                    // direction: [ coord[0], coord[1], -1 ]
                 };
 
+                if(x === 360 && y === 360)
+                {
+                    console.log("Ray dir at middle:", ray.direction);
+                }
+                
                 const colour: Rgba255 = this._traceRay(ray);
                 $clampRgba255(colour);
 

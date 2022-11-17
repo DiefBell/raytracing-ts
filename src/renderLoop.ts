@@ -16,8 +16,8 @@ export const renderLoop = (display : CanvasDisplay) =>
         {
             upRads: 30 * Math.PI / 180,
             downRads: 30 * Math.PI / 180,
-            leftRads: 50 * Math.PI / 180,
-            rightRads: 50 * Math.PI / 180
+            leftRads: 30 * Math.PI / 180,
+            rightRads: 30 * Math.PI / 180
         },
         0.1,
         100

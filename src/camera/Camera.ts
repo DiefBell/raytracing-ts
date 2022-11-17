@@ -23,8 +23,8 @@ enum EMouseButton
 
 export class Camera implements ICamera
 {
-    private _forward: vector.Vector3;
-    public get direction() { return this._forward; }
+    private _direction: vector.Vector3;
+    public get direction() { return this._direction; }
 
     private _position: vector.Vector3;
     public get position() { return this._position; }
@@ -60,12 +60,13 @@ export class Camera implements ICamera
         viewportHeight: number,
         keyboard: Keyboard,
         mouse: Mouse,
-        fov: matrix.IFov = {
-            upRads: 30 * Math.PI / 180,
-            downRads: 30 * Math.PI / 180,
-            leftRads: 50 * Math.PI / 180,
-            rightRads: 50 * Math.PI / 180
-        },
+        // fov: matrix.IFov = {
+        //     upRads: 30 * Math.PI / 180,
+        //     downRads: 30 * Math.PI / 180,
+        //     leftRads: 30 * Math.PI / 180,
+        //     rightRads: 30 * Math.PI / 180
+        // },
+        fov: matrix.IFov,
         nearClip = 0.1,
         farClip = 100
     )
@@ -76,8 +77,8 @@ export class Camera implements ICamera
         this._keyboard = keyboard;
         this._mouse = mouse;
 
-        this._forward = [ 0, 0, -1 ];
-        this._position = [ 0, 0, 3 ];
+        this._position = [ 0, 0, 1 ];
+        this._direction = [ 0, 0, -1 ];
 
         this._lastMousePosition = [
             mouse.getMouseX(),
@@ -126,7 +127,7 @@ export class Camera implements ICamera
             this._position = vector.add(
                 this._position,
                 vector.scale(
-                    this._forward,
+                    this._direction,
                     ts * this._strafeSpeed
                 )
             );
@@ -137,14 +138,14 @@ export class Camera implements ICamera
             this._position = vector.subtract(
                 this._position,
                 vector.scale(
-                    this._forward,
+                    this._direction,
                     ts * this._strafeSpeed
                 )
             );
             moved = true;
         }
 
-        const rightDirection = vector.cross3D(this._forward, vector.up());
+        const rightDirection = vector.cross3D(this._direction, vector.up());
         if(keyboard.getKeyDown(EKeycode.D))
         {
             this._position = vector.add(
@@ -198,10 +199,10 @@ export class Camera implements ICamera
         {
             const pitchDelta = delta[1] * this._rotationSpeed;
             const yawDelta = delta[0] * this._rotationSpeed;
-            console.log(`Pitch: ${pitchDelta}`);
-            console.log(`Yaw: ${yawDelta}`);
+            // console.log(`Pitch: ${pitchDelta}`);
+            // console.log(`Yaw: ${yawDelta}`);
 
-            const rightDirection = vector.cross3D(this._forward, vector.up());
+            const rightDirection = vector.cross3D(this._direction, vector.up());
             const qRot: quaternion.Quaternion = vector.normalize(
                 vector.cross4D(
                     quaternion.fromAxisAngle(rightDirection, -1 * pitchDelta),
@@ -209,8 +210,8 @@ export class Camera implements ICamera
                 )
             );
 
-            this._forward = this._forward = quaternion.rotate(
-                this._forward,
+            this._direction = this._direction = quaternion.rotate(
+                this._direction,
                 qRot
             );
 
@@ -234,6 +235,12 @@ export class Camera implements ICamera
             throw new Error("Idk something went wrong I guess");
 
         this._inverseProjection = inverseProjection;
+        // this._inverseProjection = [
+        //     [ 1.191753592594210, 0, 0, 0 ],
+        //     [ 0, 0.5773502691896257, 0, 0 ],
+        //     [ 0, 0, 0, -1 ],
+        //     [ 0, 0, -9.99000000000000, 10 ]
+        // ];
     }
 
     private _recalculateRayDirections(): void
@@ -261,21 +268,21 @@ export class Camera implements ICamera
                 );
                 const [ i, j, k, w ] = target;
 
-                const normalisedTargetVec: vector.Vec3 = vector.normalise(
+                const normalisedTargetVec: vector.Vec3 = //vector.normalise(
                     vector.scale(
                         [ i, j, k ],
                         1 / w
-                    )
+                    // )
                 );
 
                 const normalisedTarget: Quaternion = [ normalisedTargetVec[0], normalisedTargetVec[1], normalisedTargetVec[2], 0 ];
 
-
                 const rayDirection = glm_utils.Mat4x1ToVector(
                     matrix.multiply(this._inverseView, glm_utils.QuatToVertMatrix(normalisedTarget))
                 )
-                .splice(3, 1) as vector.Vector3;
+                .slice(0, 3) as vector.Vector3;
 
+                const yInverted = this._viewportWidth - y;
                 this._rayDirections[ x + y * this._viewportWidth] = rayDirection;
             }
         }
