@@ -93,8 +93,10 @@ export class Camera implements ICamera
         this._recalculateRayDirections();
     }
 
-    public update(ts: number)
+    public update(ts: number): number
     {
+        const start = performance.now();
+
         const keyboardMoved = this._updateKeyboard(ts);
         const mouseMoved = this._updateMouse();
 
@@ -103,6 +105,8 @@ export class Camera implements ICamera
             this._recalculateProjection();
             this._recalculateRayDirections();
         }
+
+        return performance.now() - start;
     }
 
     public onResize(width: number, height: number)

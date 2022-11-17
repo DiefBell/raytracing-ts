@@ -4,7 +4,8 @@ import { matrix, vector } from "glm-ts";
 
 export interface ICamera
 {
-    update : (ts : number) => void;
+    // returns time to run in ms
+    update : (ts : number) => number;
     onResize : (width : number, height : number) => void;
 
     direction : vector.Vector3;

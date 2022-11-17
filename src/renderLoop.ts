@@ -46,10 +46,11 @@ export const renderLoop = (display : CanvasDisplay) =>
     while(!display.shouldClose())
     {
         display.pollEvents();
-        camera.update(renderLoopTime);
+        const cameraUpdateTime = camera.update(renderLoopTime);
+        console.log(`\nCamera updated in \x1b[1m\x1b[34m${ cameraUpdateTime.toFixed(2) } ms\x1b[0m.`);
 
         const render = renderer.render(camera);
-        console.info(`\nRender completed in \x1b[1m\x1b[32m${ render.time.toFixed(2) } ms\x1b[0m.`);
+        console.info(`Render completed in \x1b[1m\x1b[32m${ render.time.toFixed(2) } ms\x1b[0m.`);
 
         context.putImageData(render.imageData, 0, 0);
 
