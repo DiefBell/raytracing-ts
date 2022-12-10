@@ -36,25 +36,9 @@ export class Renderer implements IRenderer
 
         for(let y = 0; y < this._finalImage.height; y++)
         {
-            // flipped because Canvas is from top-left corner,
-            // instead of bottom-left.
-            const yFlipped = (this._finalImage.height - 1) - y; // TODO: need this in camera
             for(let x = 0; x < this._finalImage.width; x++)
             {
                 const index = x + (y * this._finalImage.width);
-                const coord : vector.Vector2 = [
-                    // normalise
-                    x / this._finalImage.width,
-                    yFlipped / this._finalImage.height
-                ];
-                coord[0] = (coord[0] * 2) -1; // -1 -> 1
-                coord[1] = (coord[1] * 2) -1; // -1 -> 1
-
-                // const colour = this.perPixel(coord);
-                // this._finalImage.setDataValue(
-                //     colour,
-                //     index
-                // );
 
                 ray = {
                     origin: camera.position,
@@ -98,15 +82,6 @@ export class Renderer implements IRenderer
         // const t0 = (-b + Math.sqrt(discriminant)) / (2 * a);
         const t1 = (-b - Math.sqrt(discriminant)) / (2 * a);
         const tClosest = t1;
-
-        // const h0 = vector3.scale(
-        //     vector3.add(rayOrigin, rayDir),
-        //     t0
-        // );
-        // const h1 = vector3.scale(
-        //     vector3.add(rayOrigin, rayDir),
-        //     t1
-        // );
 
         const hitPoint = vector.add(
             // full ray from ray origin to hit point

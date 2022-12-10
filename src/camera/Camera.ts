@@ -180,8 +180,6 @@ export class Camera implements ICamera
             moved = true;
         }
 
-        if(moved) console.log("Dist", dist);
-
         return moved;
     }
 
@@ -212,8 +210,6 @@ export class Camera implements ICamera
         {
             const pitchDelta = delta[1] * this._rotationSpeed;
             const yawDelta = delta[0] * this._rotationSpeed;
-            // console.log(`Pitch: ${pitchDelta}`);
-            // console.log(`Yaw: ${yawDelta}`);
 
             const rightDirection = vector.cross3D(this._direction, vector.up());
             const qRot: quaternion.Quaternion = vector.normalize(
@@ -248,12 +244,6 @@ export class Camera implements ICamera
             throw new Error("Idk something went wrong I guess");
 
         this._inverseProjection = inverseProjection;
-        // this._inverseProjection = [
-        //     [ 1.191753592594210, 0, 0, 0 ],
-        //     [ 0, 0.5773502691896257, 0, 0 ],
-        //     [ 0, 0, 0, -1 ],
-        //     [ 0, 0, -9.99000000000000, 10 ]
-        // ];
     }
 
     private _recalculateRayDirections(): void
