@@ -1,5 +1,5 @@
 import { Keyboard, Mouse } from "@minecraftts/seraph";
-import { matrix, vector } from "glm-ts";
+import { vector } from "glm-ts";
 
 
 export interface ICamera
@@ -21,7 +21,7 @@ type ICameraConstructor = new (
     viewportHeight: number,
     keyboard : Keyboard,
     mouse: Mouse,
-    fov: matrix.IFov,
+    verticalFov: number,
     nearClip: number,
     farClip: number
 ) => ICamera;

@@ -6,6 +6,8 @@ import { Renderer } from "./renderer/Renderer";
 export const renderLoop = (display : CanvasDisplay) =>
 {
     const renderer = new Renderer(display.getWidth(), display.getHeight());
+    
+    let context = display.getGraphics();
 
     const camera = constructCamera(
         Camera,
@@ -13,17 +15,10 @@ export const renderLoop = (display : CanvasDisplay) =>
         display.getHeight(),
         display.getKeyboard(),
         display.getMouse(),
-        {
-            upRads: 30 * Math.PI / 180,
-            downRads: 30 * Math.PI / 180,
-            leftRads: 30 * Math.PI / 180,
-            rightRads: 30 * Math.PI / 180
-        },
+        90 * Math.PI / 180,
         0.1,
         100
     );
-    
-    let context = display.getGraphics();
 
     display.on(
         "resize",

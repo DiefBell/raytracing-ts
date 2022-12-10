@@ -1,5 +1,4 @@
 import { glm_utils, matrix, quaternion, vector } from 'glm-ts';
-import { Quaternion } from 'glm-ts/lib/quaternion';
 
 import { Keyboard, Mouse } from '@minecraftts/seraph';
 
@@ -33,7 +32,7 @@ export class Camera implements ICamera
     private _mouse: Mouse;
     private _lastMousePosition: vector.Vector2;
 
-    private _strafeSpeed = 5;
+    private _strafeSpeed = 0.0005;
     public get strafeSpeed() { return this._strafeSpeed; }
 
     private _rotationSpeed = 0.3;
@@ -48,7 +47,7 @@ export class Camera implements ICamera
     private _viewportWidth = 0;
     private _viewportHeight = 0;
 
-    private _fov: matrix.IFov;
+    private _fov: matrix.IFovAspectRatio;
     private _nearClip: number;
     private _farClip: number;
 
@@ -60,13 +59,7 @@ export class Camera implements ICamera
         viewportHeight: number,
         keyboard: Keyboard,
         mouse: Mouse,
-        // fov: matrix.IFov = {
-        //     upRads: 30 * Math.PI / 180,
-        //     downRads: 30 * Math.PI / 180,
-        //     leftRads: 30 * Math.PI / 180,
-        //     rightRads: 30 * Math.PI / 180
-        // },
-        fov: matrix.IFov,
+        verticalFovRads: number,
         nearClip = 0.1,
         farClip = 100
     )
@@ -85,7 +78,11 @@ export class Camera implements ICamera
             mouse.getMouseY()
         ];
 
-        this._fov = fov;
+        this._fov = {
+            type: "Field of View from a vertical FOV angle and an aspect ratio",
+            verticalRads: verticalFovRads,
+            aspectRatio: viewportWidth / viewportHeight
+        };
         this._nearClip = nearClip;
         this._farClip = farClip;
 
@@ -117,6 +114,12 @@ export class Camera implements ICamera
         this._viewportWidth = width;
         this._viewportHeight = height;
 
+        this._fov = {
+            type: "Field of View from a vertical FOV angle and an aspect ratio",
+            verticalRads: this._fov.verticalRads,
+            aspectRatio: width / height
+        };
+
         this._recalculateProjection();
         this._recalculateRayDirections();
     }
@@ -126,13 +129,15 @@ export class Camera implements ICamera
         const { _keyboard: keyboard } = this;
 
         let moved = false;
+        const dist = ts * this._strafeSpeed;
+
         if(keyboard.getKeyDown(EKeycode.W))
         {
             this._position = vector.add(
                 this._position,
                 vector.scale(
                     this._direction,
-                    ts * this._strafeSpeed
+                    dist
                 )
             );
             moved = true;
@@ -143,7 +148,7 @@ export class Camera implements ICamera
                 this._position,
                 vector.scale(
                     this._direction,
-                    ts * this._strafeSpeed
+                    dist
                 )
             );
             moved = true;
@@ -152,26 +157,30 @@ export class Camera implements ICamera
         const rightDirection = vector.cross3D(this._direction, vector.up());
         if(keyboard.getKeyDown(EKeycode.D))
         {
+            
             this._position = vector.add(
                 this._position,
                 vector.scale(
                     rightDirection,
-                    ts * this._strafeSpeed
+                    dist
                 )
             );
             moved = true;
         }
         else if(keyboard.getKeyDown(EKeycode.A))
         {
+            const dist = ts * this._strafeSpeed;
             this._position = vector.subtract(
                 this._position,
                 vector.scale(
                     rightDirection,
-                    ts * this._strafeSpeed
+                    dist
                 )
             );
             moved = true;
         }
+
+        if(moved) console.log("Dist", dist);
 
         return moved;
     }
@@ -282,7 +291,7 @@ export class Camera implements ICamera
                     // )
                 );
 
-                const normalisedTarget: Quaternion = [ normalisedTargetVec[0], normalisedTargetVec[1], normalisedTargetVec[2], 0 ];
+                const normalisedTarget: quaternion.Quaternion = [ normalisedTargetVec[0], normalisedTargetVec[1], normalisedTargetVec[2], 0 ];
 
                 const rayDirection = glm_utils.Mat4x1ToVector(
                     matrix.multiply(this._inverseView, glm_utils.QuatToVertMatrix(normalisedTarget))

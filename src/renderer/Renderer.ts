@@ -113,13 +113,16 @@ export class Renderer implements IRenderer
             vector.scale(ray.direction, tClosest),
             // add origin point to get absolute hit point location
             ray.origin
-        );
+        ) as vector.Vector<3>;
 
         const normal = vector.normalise(hitPoint);
 
         const lightDir : vector.Vector3 = vector.normalise([ -1, -1, -1 ]);
 
-        const lightIntensity = vector.dot(normal, vector.scale(lightDir, -1 ));
+        const lightIntensity = Math.max(
+            0,
+            vector.dot(normal, vector.scale(lightDir, -1 )) // == cos(angle), which can go below 0
+        );
 
         const colourRgb = vector.scale(SPHERE_COLOUR, lightIntensity) as Rgb255;
 
