@@ -18,7 +18,6 @@ import
 	} from "../colour/colour";
 
 import { vector } from "glm-ts";
-import { BYTES_PER_UINT8 } from "../rawImageData/RawImageData";
 
 const {
 	sharedBuffer,
@@ -30,20 +29,8 @@ const {
 
 const buffer = new Uint8ClampedArray(sharedBuffer);
 
-const logged = false;
-
 for (let i = minIndex; i < maxIndex; i++)
 {
-	// buffer.set(
-	// 	[
-	// 		Math.random() * 255,
-	// 		Math.random() * 255,
-	// 		Math.random() * 255,
-	// 		255
-	// 	],
-	// 	i * ELEMENTS_PER_RGBA
-	// );
-
 	const SPHERE_COLOUR: Rgb255 = [255, 0, 255];
 	const BG_COLOUR: Rgba255 = [0, 0, 0, 255];
 	const sphereRadius = 0.5;
