@@ -4,5 +4,5 @@ import type { IRenderInfo } from "./IRenderInfo";
 export interface IRenderer
 {
     onResize : (width : number, height : number) => void;
-    render : (camera: ICamera) => IRenderInfo;
+    render : (camera: ICamera) => Promise<IRenderInfo>;
 }

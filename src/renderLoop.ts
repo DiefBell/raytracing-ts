@@ -3,7 +3,7 @@ import { Camera } from "./camera/Camera";
 import { constructCamera } from "./camera/ICamera";
 import { Renderer } from "./renderer/Renderer";
 
-export const renderLoop = (display : CanvasDisplay) =>
+export const renderLoop = async (display : CanvasDisplay) =>
 {
     const renderer = new Renderer(display.getWidth(), display.getHeight());
     
@@ -44,7 +44,7 @@ export const renderLoop = (display : CanvasDisplay) =>
         const cameraUpdateTime = camera.update(renderLoopTime);
         console.log(`\nCamera updated in \x1b[1m\x1b[34m${ cameraUpdateTime.toFixed(2) } ms\x1b[0m.`);
 
-        const render = renderer.render(camera);
+        const render = await renderer.render(camera);
         console.info(`Render completed in \x1b[1m\x1b[32m${ render.time.toFixed(2) } ms\x1b[0m.`);
 
         context.putImageData(render.imageData, 0, 0);

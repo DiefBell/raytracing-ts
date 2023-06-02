@@ -5,14 +5,14 @@ import { RawImageData } from "../rawImageData/RawImageData";
 import { type IRay } from "./IRay";
 import { type IRenderer } from "./IRenderer";
 import type { IRenderInfo } from "./IRenderInfo";
-// import * as os from "os";
+import * as os from "os";
 import * as path from "path";
 
 import { Worker } from "worker_threads";
 import { type IWorkerData } from "./IWorkerData";
 
-// const MAX_THREADS = os.cpus().length - 1;
-const MAX_THREADS = 2;
+const MAX_THREADS = os.cpus().length - 1;
+// const MAX_THREADS = 1;
 // const MAX_THREADS = Math.max(
 // 	Math.floor(os.cpus().length / 2),
 // 	1
@@ -40,11 +40,11 @@ export class Renderer implements IRenderer
         }
     }
 
-    public render(camera: ICamera) : IRenderInfo
+    public async render(camera: ICamera) : Promise<IRenderInfo>
     {
         const startTime = performance.now();
 
-		const workers: Worker[] = [];
+		const workers = new Array<Promise<void>>();
 		const rowsPerThread = Math.ceil(this._finalImage.height / MAX_THREADS);
 
 		for(let i = 0; i < MAX_THREADS; i++)
@@ -64,23 +64,20 @@ export class Renderer implements IRenderer
 				cameraPos: camera.position,
 				cameraRayDirs
 			};
-			workers.push(
-				new Worker(workerFile, { workerData })
-			);
-		}
 
-		Promise.all(
-			workers.map(
-				(worker) => new Promise(
-					(resolve, reject) =>
+			workers.push(
+				new Promise(
+					(resolve, reject) => 
 					{
-						worker.on("message", console.log);
+						const worker = new Worker(workerFile, { workerData });
 						worker.on("exit", resolve);
 						worker.on("error", reject);
 					}
 				)
-			)
-		);
+			);
+		}
+
+		await Promise.all(workers);
 
         return {
             time: performance.now() - startTime,
