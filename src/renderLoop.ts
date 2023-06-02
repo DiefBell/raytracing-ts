@@ -1,4 +1,4 @@
-import { CanvasDisplay } from "@minecraftts/seraph";
+import { type CanvasDisplay } from "@minecraftts/seraph";
 import { Camera } from "./camera/Camera";
 import { constructCamera } from "./camera/ICamera";
 import { Renderer } from "./renderer/Renderer";

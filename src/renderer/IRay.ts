@@ -1,7 +1,7 @@
-import { Vector } from "glm-ts/lib/vector";
+import { type vector } from "glm-ts";
 
 export interface IRay
 {
-    origin: Vector<3>;
-    direction: Vector<3>;
+    origin: vector.Vector<3>;
+    direction: vector.Vector<3>;
 }

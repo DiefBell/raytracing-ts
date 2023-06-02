@@ -1,4 +1,4 @@
-import { ICamera } from "../camera/ICamera";
+import { type ICamera } from "../camera/ICamera";
 import type { IRenderInfo } from "./IRenderInfo";
 
 export interface IRenderer

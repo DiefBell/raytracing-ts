@@ -24,6 +24,13 @@ module.exports = {
 		"brace-style": "off",
 		"@typescript-eslint/brace-style": [ "error", "allman", { "allowSingleLine": true } ],
 		"semi": "error",
-		"eol-last": "error"
+		"eol-last": "error",
+		"@typescript-eslint/consistent-type-imports": [
+			"error",
+			{
+				prefer: "type-imports",
+				fixStyle: "inline-type-imports"
+			}
+		]
     }
 };

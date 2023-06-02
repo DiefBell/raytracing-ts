@@ -1,5 +1,5 @@
-import { Keyboard, Mouse } from "@minecraftts/seraph";
-import { vector } from "glm-ts";
+import { type Keyboard, type Mouse } from "@minecraftts/seraph";
+import { type vector } from "glm-ts";
 
 
 export interface ICamera

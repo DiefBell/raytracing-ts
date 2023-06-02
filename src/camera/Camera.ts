@@ -1,8 +1,8 @@
 import { glm_utils, matrix, quaternion, vector } from 'glm-ts';
 
-import { Keyboard, Mouse } from '@minecraftts/seraph';
+import { type Keyboard, type Mouse } from '@minecraftts/seraph';
 
-import { ICamera } from './ICamera';
+import { type ICamera } from './ICamera';
 
 enum EKeycode
 {

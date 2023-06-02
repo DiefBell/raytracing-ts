@@ -1,11 +1,18 @@
 import { vector } from "glm-ts";
-import { ICamera } from "../camera/ICamera";
-import { $clampRgba255, Rgb255, Rgba255 } from "../colour/colour";
+import { type ICamera } from "../camera/ICamera";
+import { $clampRgba255, type Rgb255, type Rgba255 } from "../colour/colour";
 import { RawImageData } from "../rawImageData/RawImageData";
-import { IRay } from "./IRay";
-import { IRenderer } from "./IRenderer";
+import { type IRay } from "./IRay";
+import { type IRenderer } from "./IRenderer";
 import type { IRenderInfo } from "./IRenderInfo";
+import * as os from "os";
+import * as path from "path";
 
+import { Worker } from "worker_threads";
+import { type IWorkerData } from "./IWorkerData";
+
+const MAX_THREADS = os.cpus().length - 1;
+const workerFile = path.join(__dirname, "./traceRay.js");
 export class Renderer implements IRenderer
 {
     private _finalImage : RawImageData;
@@ -34,32 +41,76 @@ export class Renderer implements IRenderer
 
         let ray: IRay;
 
-        for(let y = 0; y < this._finalImage.height; y++)
-        {
-            for(let x = 0; x < this._finalImage.width; x++)
-            {
-                const index = x + (y * this._finalImage.width);
+		const buffer = new Uint8ClampedArray(this._finalImage.rawDataBuffer);
 
-                ray = {
-                    origin: camera.position,
-                    direction: camera.rayDirections[index]
-                    // direction: [ coord[0], coord[1], -1 ]
-                };
+		const workers: Worker[] = [];
+		const rowsPerThread = Math.ceil(this._finalImage.height / MAX_THREADS);
+
+		for(let i = 0; i < MAX_THREADS; i++)
+		{
+			const yMin = rowsPerThread * i;
+			const yMax = Math.max(yMin + this._finalImage.width, this._finalImage.height);
+
+			const minIndex = yMin * this._finalImage.width;
+			const maxIndex = yMax * this._finalImage.width + this._finalImage.width;
+
+			const cameraRayDirs = camera.rayDirections.slice(minIndex, maxIndex);
+
+			const workerData: IWorkerData = {
+				sharedBuffer: this._finalImage.rawDataBuffer,
+				// yMin,
+				// yMax,
+				// width: this._finalImage.width,
+				// height: this._finalImage.height,
+				minIndex,
+				maxIndex,
+				cameraPos: camera.position,
+				cameraRayDirs
+			};
+			workers.push(
+				new Worker(workerFile, { workerData })
+			);
+		}
+
+		Promise.all(
+			workers.map(
+				(worker) => new Promise(
+					(resolve) =>
+					{
+						worker.on("message", console.log);
+						worker.on("exit", resolve);
+					}
+				)
+			)
+		);
+
+        // for(let y = 0; y < this._finalImage.height; y++)
+        // {
+        //     for(let x = 0; x < this._finalImage.width; x++)
+        //     {
+        //         const index = x + (y * this._finalImage.width);
+
+        //         ray = {
+        //             origin: camera.position,
+        //             direction: camera.rayDirections[index]
+        //             // direction: [ coord[0], coord[1], -1 ]
+        //         };
                 
-                const colour: Rgba255 = this._traceRay(ray);
-                $clampRgba255(colour);
+        //         const colour: Rgba255 = this._traceRay(ray);
+        //         $clampRgba255(colour);
 
-                this._finalImage.setDataValue(
-                    colour,
-                    index
-                );
-            }
+		// 		buffer.set(colour, index * 4);
+        //         // this._finalImage.setDataValue(
+        //         //     colour,
+        //         //     index
+        //         // );
+        //     }
 
-        }
+        // }
 
         return {
             time: performance.now() - startTime,
-            imageData: this._finalImage.getImageData()
+            imageData: this._finalImage.imageData
         };
     }
 
