@@ -2,7 +2,7 @@ import { ELEMENTS_PER_RGBA, Rgba255 } from "../colour/colour";
 import { ImageData } from "canvas";
 import { type IRawImageData } from "./IRawImageData";
 
-const BYTES_PER_UINT8 = 8;
+export const BYTES_PER_UINT8 = 1;
 
 // names "Raw" ImageData because "ImageData" is already taken Canvas
 export class RawImageData implements IRawImageData
@@ -36,7 +36,7 @@ export class RawImageData implements IRawImageData
 			width * height * ELEMENTS_PER_RGBA * BYTES_PER_UINT8
 		);
 		this._imageData = new Uint8ClampedArray(this._rawDataBuffer);
-		this._imageData.fill(0);
+		this._imageData.fill(255);
 
         // const imageBuffer = new ArrayBuffer(width * height * ELEMENTS_PER_RGBA * BYTES_PER_UINT8);
         // this._data = new Uint8ClampedArray(imageBuffer);

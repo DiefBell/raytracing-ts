@@ -11,7 +11,12 @@ import * as path from "path";
 import { Worker } from "worker_threads";
 import { type IWorkerData } from "./IWorkerData";
 
-const MAX_THREADS = os.cpus().length - 1;
+// const MAX_THREADS = os.cpus().length - 1;
+const MAX_THREADS = 2;
+// const MAX_THREADS = Math.max(
+// 	Math.floor(os.cpus().length / 2),
+// 	1
+// );
 const workerFile = path.join(__dirname, "./traceRay.js");
 export class Renderer implements IRenderer
 {
@@ -49,12 +54,12 @@ export class Renderer implements IRenderer
 		for(let i = 0; i < MAX_THREADS; i++)
 		{
 			const yMin = rowsPerThread * i;
-			const yMax = Math.max(yMin + this._finalImage.width, this._finalImage.height);
+			const yMax = Math.min(yMin + this._finalImage.width, this._finalImage.height);
 
 			const minIndex = yMin * this._finalImage.width;
-			const maxIndex = yMax * this._finalImage.width + this._finalImage.width;
+			const maxIndex = yMax * this._finalImage.width;
 
-			const cameraRayDirs = camera.rayDirections.slice(minIndex, maxIndex);
+			const cameraRayDirs = camera.rayDirections;
 
 			const workerData: IWorkerData = {
 				sharedBuffer: this._finalImage.rawDataBuffer,
@@ -75,10 +80,11 @@ export class Renderer implements IRenderer
 		Promise.all(
 			workers.map(
 				(worker) => new Promise(
-					(resolve) =>
+					(resolve, reject) =>
 					{
 						worker.on("message", console.log);
 						worker.on("exit", resolve);
+						worker.on("error", reject);
 					}
 				)
 			)
