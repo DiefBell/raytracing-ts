@@ -1,8 +1,5 @@
-import { vector } from "glm-ts";
 import { type ICamera } from "../camera/ICamera";
-import { type Rgb255, type Rgba255 } from "../colour/colour";
 import { RawImageData } from "../rawImageData/RawImageData";
-import { type IRay } from "./IRay";
 import { type IRenderer } from "./IRenderer";
 import type { IRenderInfo } from "./IRenderInfo";
 import * as os from "os";
@@ -11,8 +8,8 @@ import * as path from "path";
 import { Worker } from "worker_threads";
 import { type IWorkerData } from "./IWorkerData";
 
-const MAX_THREADS = os.cpus().length - 1;
-// const MAX_THREADS = 1;
+// const MAX_THREADS = os.cpus().length - 1;
+const MAX_THREADS = 1;
 // const MAX_THREADS = Math.max(
 // 	Math.floor(os.cpus().length / 2),
 // 	1

@@ -5,11 +5,12 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "start": "node ./src/index.js",
+    "start": "node ./build/index.js",
     "lint": "eslint ./src/**/*.ts",
     "lint:fix": "eslint ./src/**/*.ts --fix",
     "start:dev": "ts-node ./src/index.ts",
-    "benchmark": "ts-node ./src/benchmark.ts",
+    "benchmark": "node ./build/benchmark.js",
+	"watch": "tsc -w",
     "test": "jest"
   },
   "devDependencies": {
