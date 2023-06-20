@@ -71,7 +71,7 @@ export class Renderer implements IRenderer
 					minIndex,
 					maxIndex,
 					cameraPos: camera.position,
-					cameraRayDirs: camera.rayDirections
+					cameraRayDirs: camera.rayDirections.slice(minIndex, maxIndex)
 				};
 				worker.postMessage(workerData);
 

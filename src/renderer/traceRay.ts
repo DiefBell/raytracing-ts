@@ -47,7 +47,7 @@ const main = async () =>
 					const BG_COLOUR: Rgba255 = [0, 0, 0, 255];
 					const sphereRadius = 0.5;
 
-					const rayDir = cameraRayDirs[i];
+					const rayDir = cameraRayDirs[i - minIndex];
 
 					try 
 					{
