@@ -2,10 +2,21 @@ import { type CanvasDisplay } from "@minecraftts/seraph";
 import { Camera } from "./camera/Camera";
 import { constructCamera } from "./camera/ICamera";
 import { Renderer } from "./renderer/Renderer";
+import * as os from "os";
+
+
+const NUM_RENDER_THREADS =
+	//Math.floor(os.cpus().length / 2);
+	// 1;
+	2;
 
 export const renderLoop = async (display : CanvasDisplay) =>
 {
-    const renderer = new Renderer(display.getWidth(), display.getHeight());
+    const renderer = new Renderer(
+		display.getWidth(),
+		display.getHeight(),
+		NUM_RENDER_THREADS
+	);
     
     let context = display.getGraphics();
 

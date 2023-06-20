@@ -2,26 +2,40 @@ import { type ICamera } from "../camera/ICamera";
 import { RawImageData } from "../rawImageData/RawImageData";
 import { type IRenderer } from "./IRenderer";
 import type { IRenderInfo } from "./IRenderInfo";
-import * as os from "os";
 import * as path from "path";
 
 import { Worker } from "worker_threads";
 import { type IWorkerData } from "./IWorkerData";
+import { type IRenderWorker } from "./IRenderWorker";
 
-// const MAX_THREADS = os.cpus().length - 1;
-const MAX_THREADS = 1;
-// const MAX_THREADS = Math.max(
-// 	Math.floor(os.cpus().length / 2),
-// 	1
-// );
 const workerFile = path.join(__dirname, "./traceRay.js");
 export class Renderer implements IRenderer
 {
     private _finalImage : RawImageData;
+	private _workers: Worker[];
 
-    constructor(initialWidth : number, initialHeight : number)
+    constructor(initialWidth : number, initialHeight : number, numWorkers: number)
     {
         this._finalImage = new RawImageData(initialWidth, initialHeight);
+		this._workers = new Array(numWorkers);
+		for(let i = 0; i < numWorkers; i++)
+		{
+			this._workers[i] = new Worker(workerFile, {
+				workerData: {
+					sharedBuffer: this._finalImage.rawDataBuffer
+				}
+			});
+
+			this._workers[i].on("exit", (code) => 
+			{
+				console.error(`Render worker ${i} exited with code ${code}`);
+			});
+
+			this._workers[i].on("message", (msg) => 
+			{
+				if(msg !== "DONE") console.log(msg);
+			});
+		}
     }
 
     public onResize(width : number, height : number) : void
@@ -41,40 +55,72 @@ export class Renderer implements IRenderer
     {
         const startTime = performance.now();
 
-		const workers = new Array<Promise<void>>();
-		const rowsPerThread = Math.ceil(this._finalImage.height / MAX_THREADS);
+		const rowsPerWorker = Math.ceil(this._finalImage.height / this._workers.length);
 
-		for(let i = 0; i < MAX_THREADS; i++)
+		const renders = this._workers.map((worker, i) =>
 		{
-			const yMin = rowsPerThread * i;
-			const yMax = Math.min(yMin + this._finalImage.width, this._finalImage.height);
+			const yMin = rowsPerWorker * i;
+			const yMax = Math.min(yMin + rowsPerWorker, this._finalImage.height);
 
 			const minIndex = yMin * this._finalImage.width;
 			const maxIndex = yMax * this._finalImage.width;
 
-			const cameraRayDirs = camera.rayDirections;
+			return new Promise<void>((resolve) =>
+			{
+				const workerData: IWorkerData = {
+					minIndex,
+					maxIndex,
+					cameraPos: camera.position,
+					cameraRayDirs: camera.rayDirections
+				};
+				worker.postMessage(workerData);
 
-			const workerData: IWorkerData = {
-				sharedBuffer: this._finalImage.rawDataBuffer,
-				minIndex,
-				maxIndex,
-				cameraPos: camera.position,
-				cameraRayDirs
-			};
-
-			workers.push(
-				new Promise(
-					(resolve, reject) => 
+				const finish = (msg: unknown) =>
+				{
+					if(msg === "DONE")
 					{
-						const worker = new Worker(workerFile, { workerData });
-						worker.on("exit", resolve);
-						worker.on("error", reject);
+						resolve();
+						worker.removeListener("message", finish);
 					}
-				)
-			);
-		}
+				};
 
-		await Promise.all(workers);
+				worker.on("message", finish);
+			});
+		});
+
+		console.log("ICI");
+
+		// for(let i = 0; i < MAX_THREADS; i++)
+		// {
+		// 	const yMin = rowsPerThread * i;
+		// 	const yMax = Math.min(yMin + this._finalImage.width, this._finalImage.height);
+
+		// 	const minIndex = yMin * this._finalImage.width;
+		// 	const maxIndex = yMax * this._finalImage.width;
+
+		// 	const cameraRayDirs = camera.rayDirections;
+
+		// 	const workerData: IWorkerData = {
+		// 		sharedBuffer: this._finalImage.rawDataBuffer,
+		// 		minIndex,
+		// 		maxIndex,
+		// 		cameraPos: camera.position,
+		// 		cameraRayDirs
+		// 	};
+
+		// 	workers.push(
+		// 		new Promise(
+		// 			(resolve, reject) => 
+		// 			{
+		// 				const worker = new Worker(workerFile, { workerData });
+		// 				worker.on("exit", resolve);
+		// 				worker.on("error", reject);
+		// 			}
+		// 		)
+		// 	);
+		// }
+
+		await Promise.all(renders);
 
         return {
             time: performance.now() - startTime,

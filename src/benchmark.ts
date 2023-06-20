@@ -2,9 +2,11 @@ import { type Keyboard, type Mouse } from "@minecraftts/seraph";
 import { Camera } from "./camera/Camera";
 import { constructCamera } from "./camera/ICamera";
 import { Renderer } from "./renderer/Renderer";
+import * as os from "os";
 
 const WIDTH = 1280;
 const HEIGHT = 720;
+const NUM_RENDER_THREADS = Math.floor(os.cpus().length / 2);
 
 const keyboardStub: Partial<Keyboard> = {
 	getKeyDown: () => false
@@ -16,7 +18,7 @@ const mouseStub: Partial<Mouse> = {
 	getButtonDown: () => false
 };
 
-const renderer = new Renderer(1280, 720);
+const renderer = new Renderer(1280, 720, NUM_RENDER_THREADS);
 
 const camera = constructCamera(
 	Camera,
