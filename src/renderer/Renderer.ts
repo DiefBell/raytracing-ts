@@ -6,23 +6,30 @@ import * as path from "path";
 
 import { Worker } from "worker_threads";
 import { type IWorkerData } from "./IWorkerData";
-import { type IRenderWorker } from "./IRenderWorker";
 
 const workerFile = path.join(__dirname, "./traceRay.js");
 export class Renderer implements IRenderer
 {
     private _finalImage : RawImageData;
 	private _workers: Worker[];
+	private _camera: ICamera;
 
-    constructor(initialWidth : number, initialHeight : number, numWorkers: number)
+    constructor(
+		initialWidth : number,
+		initialHeight : number,
+		numWorkers: number,
+		camera: ICamera
+	)
     {
         this._finalImage = new RawImageData(initialWidth, initialHeight);
+		this._camera = camera;
 		this._workers = new Array(numWorkers);
 		for(let i = 0; i < numWorkers; i++)
 		{
 			this._workers[i] = new Worker(workerFile, {
 				workerData: {
-					sharedBuffer: this._finalImage.rawDataBuffer
+					imageBuffer: this._finalImage.rawDataBuffer,
+					cameraRaysBuffer: this._camera.rayDirectionsBuffer
 				}
 			});
 
@@ -51,7 +58,7 @@ export class Renderer implements IRenderer
         }
     }
 
-    public async render(camera: ICamera) : Promise<IRenderInfo>
+    public async render() : Promise<IRenderInfo>
     {
         const startTime = performance.now();
 
@@ -70,8 +77,7 @@ export class Renderer implements IRenderer
 				const workerData: IWorkerData = {
 					minIndex,
 					maxIndex,
-					cameraPos: camera.position,
-					cameraRayDirs: camera.rayDirections.slice(minIndex, maxIndex)
+					cameraPos: this._camera.position
 				};
 				worker.postMessage(workerData);
 
@@ -87,38 +93,6 @@ export class Renderer implements IRenderer
 				worker.on("message", finish);
 			});
 		});
-
-		console.log("ICI");
-
-		// for(let i = 0; i < MAX_THREADS; i++)
-		// {
-		// 	const yMin = rowsPerThread * i;
-		// 	const yMax = Math.min(yMin + this._finalImage.width, this._finalImage.height);
-
-		// 	const minIndex = yMin * this._finalImage.width;
-		// 	const maxIndex = yMax * this._finalImage.width;
-
-		// 	const cameraRayDirs = camera.rayDirections;
-
-		// 	const workerData: IWorkerData = {
-		// 		sharedBuffer: this._finalImage.rawDataBuffer,
-		// 		minIndex,
-		// 		maxIndex,
-		// 		cameraPos: camera.position,
-		// 		cameraRayDirs
-		// 	};
-
-		// 	workers.push(
-		// 		new Promise(
-		// 			(resolve, reject) => 
-		// 			{
-		// 				const worker = new Worker(workerFile, { workerData });
-		// 				worker.on("exit", resolve);
-		// 				worker.on("error", reject);
-		// 			}
-		// 		)
-		// 	);
-		// }
 
 		await Promise.all(renders);
 

@@ -18,8 +18,6 @@ const mouseStub: Partial<Mouse> = {
 	getButtonDown: () => false
 };
 
-const renderer = new Renderer(1280, 720, NUM_RENDER_THREADS);
-
 const camera = constructCamera(
 	Camera,
 	WIDTH,
@@ -31,6 +29,9 @@ const camera = constructCamera(
 	100
 );
 
+const renderer = new Renderer(1280, 720, NUM_RENDER_THREADS, camera);
+
+
 const main = async() =>
 {
 	let cont = true;
@@ -38,7 +39,7 @@ const main = async() =>
 	
 	while(cont)
 	{
-		const render = await renderer.render(camera);
+		const render = await renderer.render();
 		console.info(`Render completed in \x1b[1m\x1b[32m${ render.time.toFixed(2) } ms\x1b[0m.`);
 	}
 

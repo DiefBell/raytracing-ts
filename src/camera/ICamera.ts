@@ -9,7 +9,7 @@ export interface ICamera
     onResize : (width : number, height : number) => void;
 
     direction : vector.Vector3;
-    rayDirections : vector.Vector3[];
+    rayDirectionsBuffer : SharedArrayBuffer;
     position: vector.Vector3;
 
     strafeSpeed: number;
