@@ -6,9 +6,10 @@ import * as os from "os";
 
 
 const NUM_RENDER_THREADS =
-	Math.floor(os.cpus().length / 2);
+	// Math.floor(os.cpus().length / 2);
 	// 1;
 	// 2;
+	os.cpus().length - 1;
 
 export const renderLoop = async (display : CanvasDisplay) =>
 {
