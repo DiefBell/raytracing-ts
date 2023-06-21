@@ -34,7 +34,7 @@ export class Camera implements ICamera
     private _mouse: Mouse;
     private _lastMousePosition: vector.Vector2;
 
-    private _strafeSpeed = 0.0005;
+    private _strafeSpeed = 0.001;
     public get strafeSpeed() { return this._strafeSpeed; }
 
     private _rotationSpeed = 0.3;
