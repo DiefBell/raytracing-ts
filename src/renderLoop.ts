@@ -3,6 +3,7 @@ import { Camera } from "./camera/Camera";
 import { constructCamera } from "./camera/ICamera";
 import { Renderer } from "./renderer/Renderer";
 import * as os from "os";
+import { Scene, Sphere } from "./scene/Scene";
 
 
 const NUM_RENDER_THREADS =
@@ -25,12 +26,26 @@ export const renderLoop = async (display : CanvasDisplay) =>
         0.1,
         100
     );
+
+    const scene = new Scene([
+        new Sphere(
+            [ -0.2, 0.15, 0.25 ],
+            0.4,
+            [ 255, 0, 255 ]
+        ),
+        new Sphere(
+            [ 0.2, -0.1, 0.2 ],
+            0.25,
+            [ 0, 64, 244 ]
+        ),
+    ]);
 	
     const renderer = new Renderer(
 		display.getWidth(),
 		display.getHeight(),
 		NUM_RENDER_THREADS,
-		camera
+		camera,
+        scene
 	);
 
     display.on(

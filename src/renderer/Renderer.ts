@@ -5,7 +5,15 @@ import type { IRenderInfo } from "./IRenderInfo";
 import * as path from "path";
 
 import { Worker } from "worker_threads";
-import { type IWorkerData } from "./IWorkerData";
+import { type IRayTraceBatch } from "./IRayTraceBatch";
+import { type Scene } from "../scene/Scene";
+
+export interface IWorkerData
+{
+	imageBuffer: SharedArrayBuffer;
+	cameraRaysBuffer: SharedArrayBuffer;
+	sceneObjectsBuffer: SharedArrayBuffer;
+}
 
 const workerFile = path.join(__dirname, "./traceRay.js");
 export class Renderer implements IRenderer
@@ -13,25 +21,30 @@ export class Renderer implements IRenderer
     private _finalImage : RawImageData;
 	private _workers: Worker[];
 	private _camera: ICamera;
+	private _scene: Scene;
 
     constructor(
 		initialWidth : number,
 		initialHeight : number,
 		numWorkers: number,
-		camera: ICamera
+		camera: ICamera,
+		scene: Scene
 	)
     {
         this._finalImage = new RawImageData(initialWidth, initialHeight);
 		this._camera = camera;
+		this._scene = scene;
 		this._workers = new Array(numWorkers);
+
+		const workerData: IWorkerData = {
+			imageBuffer: this._finalImage.rawDataBuffer,
+			cameraRaysBuffer: this._camera.rayDirectionsBuffer,
+			sceneObjectsBuffer: this._scene.sceneObjectBuffer
+		};
+
 		for(let i = 0; i < numWorkers; i++)
 		{
-			this._workers[i] = new Worker(workerFile, {
-				workerData: {
-					imageBuffer: this._finalImage.rawDataBuffer,
-					cameraRaysBuffer: this._camera.rayDirectionsBuffer
-				}
-			});
+			this._workers[i] = new Worker(workerFile, { workerData });
 
 			this._workers[i].on("exit", (code) => 
 			{
@@ -74,7 +87,7 @@ export class Renderer implements IRenderer
 
 			return new Promise<void>((resolve) =>
 			{
-				const workerData: IWorkerData = {
+				const workerData: IRayTraceBatch = {
 					minIndex,
 					maxIndex,
 					cameraPos: this._camera.position

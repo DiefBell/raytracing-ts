@@ -3,6 +3,7 @@ import { Camera } from "./camera/Camera";
 import { constructCamera } from "./camera/ICamera";
 import { Renderer } from "./renderer/Renderer";
 import * as os from "os";
+import { Scene, Sphere } from "./scene/Scene";
 
 const WIDTH = 1280;
 const HEIGHT = 720;
@@ -29,7 +30,15 @@ const camera = constructCamera(
 	100
 );
 
-const renderer = new Renderer(1280, 720, NUM_RENDER_THREADS, camera);
+const scene = new Scene([
+	new Sphere(
+		[ 0, 0, 0 ],
+		0.5,
+		[ 255, 0, 255 ]
+	)
+]);
+
+const renderer = new Renderer(1280, 720, NUM_RENDER_THREADS, camera, scene);
 
 
 const main = async() =>
