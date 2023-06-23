@@ -1,3 +1,5 @@
+export type Rgb255 = [ number, number, number ];
+
 export type Rgba255 = [ number, number, number, number ];
 export type Rgba1 = [ number, number, number, number ];
 

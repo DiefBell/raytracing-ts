@@ -27,7 +27,8 @@ export const magnitude = (vec: Vector2): number =>
 		vec[1] ** vec[1]
 	);
 
-export const unit = (vec: Vector2): Vector2 => {
+export const unit = (vec: Vector2): Vector2 => 
+{
 	const mag = magnitude(vec);
 	return [
 		vec[0] / mag,
@@ -36,7 +37,8 @@ export const unit = (vec: Vector2): Vector2 => {
 };
 export const dir = unit;
 
-export const normalise = (vec: Vector2): void => {
+export const normalise = (vec: Vector2): void => 
+{
 	const mag = magnitude(vec);
 	vec[0] /= mag;
 	vec[1] /= mag;

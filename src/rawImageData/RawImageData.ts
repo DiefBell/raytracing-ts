@@ -1,24 +1,14 @@
 import { ELEMENTS_PER_RGBA, Rgba255 } from "../colour/colour";
 import { ImageData } from "canvas";
+import { IRawImageData } from "./IRawImageData";
 
 const BYTES_PER_UINT8 = 8;
 
-export class RawImageData
+// names "Raw" ImageData because "ImageData" is already taken Canvas
+export class RawImageData implements IRawImageData
 {
     private _data: Uint8ClampedArray;
     public get data() { return this._data; }
-    // public set data(newData) { this._data = newData; }
-    public setData(newData: Rgba255[])
-    {
-        this._data = Uint8ClampedArray.from(newData.flat());
-    }
-    public setDataValue(newData: Rgba255, index: number) {
-        this._data.set(newData, index * 4);
-    }
-    public getImageData()
-    {
-        return new ImageData(this._data, this._width, this._height, { colorSpace: "srgb" });
-    }
 
     private _width: number;
     public get width() { return this._width; }
@@ -36,11 +26,26 @@ export class RawImageData
         this._data.fill(1);
     }
 
-    public resize(width: number, height: number)
+    // this method is seriously bloody slow
+    public setData(newData: Rgba255[]): void
+    {
+        this._data = Uint8ClampedArray.from(newData.flat());
+    }
+
+    // this way is about 7x faster
+    public setDataValue(newData: Rgba255, index: number): void
+    {
+        this._data.set(newData, index * 4);
+    }
+
+    public getImageData(): ImageData
+    {
+        return new ImageData(this._data, this._width, this._height, { colorSpace: "srgb" });
+    }
+
+    public resize(width: number, height: number): void
     {
         const imageBuffer = new ArrayBuffer(width * height * ELEMENTS_PER_RGBA * BYTES_PER_UINT8)
         this._data = new Uint8ClampedArray(imageBuffer);
-        console.log(`Resized image data to ${this._data.length}`);
-        this._data.fill(1);
     }
 }
