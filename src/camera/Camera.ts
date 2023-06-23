@@ -24,15 +24,15 @@ const ELEMENTS_PER_RAY_DIR = 3;
 
 export class Camera implements ICamera
 {
-    private _direction: vector.Vector3;
+    private _direction : vector.Vector3;
     public get direction() { return this._direction; }
 
-    private _position: vector.Vector3;
+    private _position : vector.Vector3;
     public get position() { return this._position; }
 
-    private _keyboard: Keyboard;
-    private _mouse: Mouse;
-    private _lastMousePosition: vector.Vector2;
+    private _keyboard : Keyboard;
+    private _mouse : Mouse;
+    private _lastMousePosition : vector.Vector2;
 
     private _strafeSpeed = 0.001;
     public get strafeSpeed() { return this._strafeSpeed; }
@@ -49,20 +49,20 @@ export class Camera implements ICamera
     private _viewportWidth = 0;
     private _viewportHeight = 0;
 
-    private _fov: matrix.IFovAspectRatio;
-    private _nearClip: number;
-    private _farClip: number;
+    private _fov : matrix.IFovAspectRatio;
+    private _nearClip : number;
+    private _farClip : number;
 
-    private _rayDirectionsBuffer: SharedArrayBuffer;
+    private _rayDirectionsBuffer : SharedArrayBuffer;
     public get rayDirectionsBuffer() { return this._rayDirectionsBuffer; }
-	private _rayDirections: Float64Array;
+	private _rayDirections : Float64Array;
 
     constructor(
-        viewportWidth: number,
-        viewportHeight: number,
-        keyboard: Keyboard,
-        mouse: Mouse,
-        verticalFovRads: number,
+        viewportWidth : number,
+        viewportHeight : number,
+        keyboard : Keyboard,
+        mouse : Mouse,
+        verticalFovRads : number,
         nearClip = 0.1,
         farClip = 100
     )
@@ -101,7 +101,7 @@ export class Camera implements ICamera
         this._recalculateRayDirections();
     }
 
-    public update(ts: number): number
+    public update(ts : number) : number
     {
         const start = performance.now();
 
@@ -117,7 +117,7 @@ export class Camera implements ICamera
         return performance.now() - start;
     }
 
-    public onResize(width: number, height: number)
+    public onResize(width : number, height : number)
     {
         if(width === this._viewportWidth && height === this._viewportHeight)
             return;
@@ -143,7 +143,7 @@ export class Camera implements ICamera
         this._recalculateRayDirections();
     }
 
-    private _updateKeyboard(ts: number): boolean
+    private _updateKeyboard(ts : number) : boolean
     {
         const { _keyboard: keyboard } = this;
 
@@ -206,7 +206,7 @@ export class Camera implements ICamera
     {
         const { _mouse: mouse } = this;
 
-        const mousePos: vector.Vector2 = [
+        const mousePos : vector.Vector2 = [
             mouse.getMouseX(),
             mouse.getMouseY()
         ];
@@ -231,7 +231,7 @@ export class Camera implements ICamera
             const yawDelta = delta[0] * this._rotationSpeed;
 
             const rightDirection = vector.cross3D(this._direction, vector.up());
-            const qRot: quaternion.Quaternion = vector.normalize(
+            const qRot : quaternion.Quaternion = vector.normalize(
                 vector.cross4D(
                     quaternion.fromAxisAngle(rightDirection, -1 * pitchDelta),
                     quaternion.fromAxisAngle(vector.up(), -1 * yawDelta)
@@ -249,7 +249,7 @@ export class Camera implements ICamera
         return false;
     }
 
-    private _recalculateProjection(): void
+    private _recalculateProjection() : void
     {
         this._projection = matrix.perspectiveFromFov(
             this._fov,
@@ -265,7 +265,7 @@ export class Camera implements ICamera
         this._inverseProjection = inverseProjection;
     }
 
-    private _recalculateRayDirections(): void
+    private _recalculateRayDirections() : void
     {
         for(let y = 0; y < this._viewportHeight; y++)
         {
@@ -274,31 +274,31 @@ export class Camera implements ICamera
             const yInverted = (this._viewportWidth - y) - 1;
             for(let x = 0; x < this._viewportWidth; x++)
             {
-                let coord: vector.Vector2 = [ x / this._viewportWidth, y / this._viewportHeight ];
+                let coord : vector.Vector2 = [ x / this._viewportWidth, y / this._viewportHeight ];
                 // map coord to -1 -> 1 range
                 coord = vector.scale(coord, 2);
                 coord = vector.subtract(coord, [ 1, 1 ]);
 
-                const homogeneousCoord: matrix.Matrix<4, 1> = [
+                const homogeneousCoord : matrix.Matrix<4, 1> = [
                     [ coord[0] ],
                     [ coord[1] ],
                     [ 1 ],
                     [ 1 ]
                 ];
 
-                const target: quaternion.Quaternion = glm_utils.Mat4x1ToQuaternion(
+                const target : quaternion.Quaternion = glm_utils.Mat4x1ToQuaternion(
                     matrix.multiply(this._inverseProjection, homogeneousCoord)
                 );
                 const [ i, j, k, w ] = target;
 
-                const normalisedTargetVec: vector.Vec3 = //vector.normalise(
+                const normalisedTargetVec : vector.Vec3 = //vector.normalise(
                     vector.scale(
                         [ i, j, k ],
                         1 / w
                     // )
                 );
 
-                const normalisedTarget: quaternion.Quaternion = [ normalisedTargetVec[0], normalisedTargetVec[1], normalisedTargetVec[2], 0 ];
+                const normalisedTarget : quaternion.Quaternion = [ normalisedTargetVec[0], normalisedTargetVec[1], normalisedTargetVec[2], 0 ];
 
                 const rayDirection = glm_utils.Mat4x1ToVector(
                     matrix.multiply(this._inverseView, glm_utils.QuatToVertMatrix(normalisedTarget))

@@ -5,33 +5,54 @@ import type { IRenderInfo } from "./IRenderInfo";
 import * as path from "path";
 
 import { Worker } from "worker_threads";
-import { type IWorkerData } from "./IWorkerData";
+import { type IRayTraceBatch } from "./IRayTraceBatch";
+import { type Scene } from "../scene/Scene";
+
+export interface IWorkerData
+{
+	imageBuffer : SharedArrayBuffer;
+	cameraRaysBuffer : SharedArrayBuffer;
+	sceneObjectsBuffer : SharedArrayBuffer;
+}
 
 const workerFile = path.join(__dirname, "./traceRay.js");
 export class Renderer implements IRenderer
 {
     private _finalImage : RawImageData;
-	private _workers: Worker[];
-	private _camera: ICamera;
+	private _workers : Worker[];
+	private _camera : ICamera;
+	private _scene : Scene;
 
     constructor(
 		initialWidth : number,
 		initialHeight : number,
-		numWorkers: number,
-		camera: ICamera
+		numWorkers : number,
+		camera : ICamera,
+		scene : Scene
 	)
     {
         this._finalImage = new RawImageData(initialWidth, initialHeight);
 		this._camera = camera;
+		this._scene = scene;
 		this._workers = new Array(numWorkers);
-		for(let i = 0; i < numWorkers; i++)
+
+		this._rebuildWorkers();
+    }
+
+	private _rebuildWorkers()
+	{
+		const workerData : IWorkerData = {
+			imageBuffer: this._finalImage.rawDataBuffer,
+			cameraRaysBuffer: this._camera.rayDirectionsBuffer,
+			sceneObjectsBuffer: this._scene.sceneObjectBuffer
+		};
+
+		for(let i = 0; i < this._workers.length; i++)
 		{
-			this._workers[i] = new Worker(workerFile, {
-				workerData: {
-					imageBuffer: this._finalImage.rawDataBuffer,
-					cameraRaysBuffer: this._camera.rayDirectionsBuffer
-				}
-			});
+			this._workers[i]?.terminate();
+			delete this._workers[i];
+
+			this._workers[i] = new Worker(workerFile, { workerData });
 
 			this._workers[i].on("exit", (code) => 
 			{
@@ -43,7 +64,12 @@ export class Renderer implements IRenderer
 				if(msg !== "DONE") console.log(msg);
 			});
 		}
-    }
+	}
+
+	public onSceneUpdate() : void
+	{
+		this._rebuildWorkers();
+	}
 
     public onResize(width : number, height : number) : void
     {
@@ -74,14 +100,14 @@ export class Renderer implements IRenderer
 
 			return new Promise<void>((resolve) =>
 			{
-				const workerData: IWorkerData = {
+				const workerData : IRayTraceBatch = {
 					minIndex,
 					maxIndex,
 					cameraPos: this._camera.position
 				};
 				worker.postMessage(workerData);
 
-				const finish = (msg: unknown) =>
+				const finish = (msg : unknown) =>
 				{
 					if(msg === "DONE")
 					{

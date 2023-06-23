@@ -7,7 +7,7 @@ export const BYTES_PER_UINT8 = 1;
 // names "Raw" ImageData because "ImageData" is already taken Canvas
 export class RawImageData implements IRawImageData
 {
-	private _rawDataBuffer: SharedArrayBuffer;
+	private _rawDataBuffer : SharedArrayBuffer;
 	public get rawDataBuffer() { return this._rawDataBuffer; }
 
     private _imageData : Uint8ClampedArray;

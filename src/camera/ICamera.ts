@@ -10,23 +10,23 @@ export interface ICamera
 
     direction : vector.Vector3;
     rayDirectionsBuffer : SharedArrayBuffer;
-    position: vector.Vector3;
+    position : vector.Vector3;
 
-    strafeSpeed: number;
-    rotationSpeed: number;
+    strafeSpeed : number;
+    rotationSpeed : number;
 }
 
 type ICameraConstructor = new (
-    viewportWidth: number,
-    viewportHeight: number,
+    viewportWidth : number,
+    viewportHeight : number,
     keyboard : Keyboard,
-    mouse: Mouse,
-    verticalFov: number,
-    nearClip: number,
-    farClip: number
+    mouse : Mouse,
+    verticalFov : number,
+    nearClip : number,
+    farClip : number
 ) => ICamera;
 
-export const constructCamera = (camera: ICameraConstructor, ...params: ConstructorParameters<ICameraConstructor>) =>
+export const constructCamera = (camera : ICameraConstructor, ...params : ConstructorParameters<ICameraConstructor>) =>
 {
     return new camera(...params);
 };

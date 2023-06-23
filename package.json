@@ -10,7 +10,7 @@
     "lint:fix": "eslint ./src/**/*.ts --fix",
     "start:dev": "ts-node ./src/index.ts",
     "benchmark": "node ./build/benchmark.js",
-	"watch": "tsc -w",
+    "watch": "tsc -w",
     "test": "jest"
   },
   "devDependencies": {
@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@minecraftts/seraph": "^0.4.0",
-    "@types/jest": "^29.2.0"
+    "@types/jest": "^29.2.0",
+    "eventemitter3": "^5.0.1"
   }
 }
