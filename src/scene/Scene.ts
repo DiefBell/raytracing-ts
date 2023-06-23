@@ -1,70 +1,59 @@
-import { type vector } from "glm-ts";
+import { Sphere } from "./Sphere";
+import { EventEmitter } from "eventemitter3";
 
-export class Scene
+export class Scene extends EventEmitter
 {
-	private _sceneObjectBuffer: SharedArrayBuffer;
+	private _spheres : Sphere[];
+	public get spheres() : ReadonlyArray<Sphere> { return this._spheres; }
+
+	private _sceneObjectBuffer : SharedArrayBuffer;
 	public get sceneObjectBuffer() { return this._sceneObjectBuffer; }
-	private _sceneObjects: Float64Array;
+	private _sceneObjects : Float64Array;
 	
-	
-	constructor(spheres: Sphere[])
+	constructor(spheres : Sphere[])
+	{
+		super();
+
+		this._spheres = spheres;
+		this.rebuildSceneBuffer();
+	}
+
+	public addSphere(sphere : Sphere) : this
+	{
+		this._spheres.push(sphere);
+		return this;
+	}
+
+	public removeSpheres(startIndex : number, count ?: number) : this
+	{
+		this._spheres.splice(startIndex, count);
+		return this;
+	}
+
+	public removeSphereAt(index : number) : this
+	{
+		this._spheres.splice(index, 1);
+		return this;
+	}
+
+	public removeSpheresAt(indices : number[]) : this
+	{
+		this._spheres = this._spheres.filter((s, i) => !indices.includes(i));
+		return this;
+	}
+
+	public rebuildSceneBuffer()
 	{
 		this._sceneObjectBuffer = new SharedArrayBuffer(
-			spheres.length * Sphere.BYTES_PER_SPHERE
+			this._spheres.length * Sphere.BYTES_PER_SPHERE
 		);
 		this._sceneObjects = new Float64Array(this._sceneObjectBuffer);
 
-		for(let i = 0; i < spheres.length; i++)
+		for(let i = 0; i < this._spheres.length; i++)
 		{
-			this._sceneObjects.set(spheres[i].toArray(), i * Sphere.ELEMENTS_PER_SPHERE);
+			this._sceneObjects.set(this._spheres[i].toArray(), i * Sphere.ELEMENTS_PER_SPHERE);
 		}
-	}
-}
 
-type T = [ number, number, number, number, number, number];
-export class Sphere
-{
-	// position = 3 elements
-	// radius = 1 element
-	// albedo = 3
-	public static ELEMENTS_PER_SPHERE = 7;
-	public static BYTES_PER_SPHERE = Float64Array.BYTES_PER_ELEMENT * Sphere.ELEMENTS_PER_SPHERE;
-
-	private _position: vector.Vec3;
-	public get position() { return this._position; }
-
-	private _radius: number;
-	public get radius() { return this._radius; }
-
-	private _albedo: vector.Vec3;
-	public get albedo() { return this._albedo; }
-
-	public toArray(): T
-	{
-		return [
-			...this._position,
-			this._radius,
-			...this._albedo
-		] as T;
-	}
-
-	public static fromArray(arr: Float64Array): Sphere
-	{
-		return new Sphere(
-			[ arr[0], arr[1], arr[2] ],
-			arr[3],
-			[ arr[4], arr[5], arr[6] ]
-		);
-	}
-
-	constructor(
-		position: vector.Vec3,
-		radius: number,
-		albedo: vector.Vec3
-	)
-	{
-		this._position = position;
-		this._radius = radius;
-		this._albedo = albedo;
+		this.emit("update");
 	}
 }

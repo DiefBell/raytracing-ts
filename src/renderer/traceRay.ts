@@ -19,7 +19,7 @@ import
 
 import { vector } from "glm-ts";
 import { type IWorkerData } from "./Renderer";
-import { Sphere } from "../scene/Scene";
+import { Sphere } from "../scene/Sphere";
 
 // const {
 // 	sharedBuffer,
@@ -43,7 +43,7 @@ const cameraRayDirs = new Float64Array(cameraRaysBuffer);
 const sceneObjects = new Float64Array(sceneObjectsBuffer);
 
 
-const BG_COLOUR: Rgba255 = [0, 0, 0, 255];
+const BG_COLOUR : Rgba255 = [0, 0, 0, 255];
 
 const main = async () =>
 {
@@ -51,7 +51,7 @@ const main = async () =>
 	{
 		parentPort?.on(
 			"message",
-			({ minIndex, maxIndex, cameraPos: rayOrigin }: IRayTraceBatch) =>
+			({ minIndex, maxIndex, cameraPos: rayOrigin } : IRayTraceBatch) =>
 			{
 				try
 				{
@@ -87,7 +87,7 @@ const main = async () =>
 						// so we can do this dodgy cast fine.
 						) as unknown as vector.Vec3;
 
-						let closestSphere: number | null = null;
+						let closestSphere : number | null = null;
 						let hitDistance = Number.MAX_SAFE_INTEGER;
 
 						for(let s = 0; s < numSpheres; s++)
@@ -128,7 +128,7 @@ const main = async () =>
 
 						const normal = vector.normalise(hitPoint);
 
-						const lightDir: vector.Vector3 = vector.normalise([-1, -1, -1]);
+						const lightDir : vector.Vector3 = vector.normalise([-1, -1, -1]);
 
 						const lightIntensity = Math.max(
 							0,

@@ -3,7 +3,8 @@ import { Camera } from "./camera/Camera";
 import { constructCamera } from "./camera/ICamera";
 import { Renderer } from "./renderer/Renderer";
 import * as os from "os";
-import { Scene, Sphere } from "./scene/Scene";
+import { Scene } from "./scene/Scene";
+import { Sphere } from "./scene/Sphere";
 
 
 const NUM_RENDER_THREADS =
@@ -47,6 +48,14 @@ export const renderLoop = async (display : CanvasDisplay) =>
 		camera,
         scene
 	);
+
+    scene.on(
+        "update",
+        () =>
+        {
+            renderer.onSceneUpdate();
+        }
+    );
 
     display.on(
         "resize",

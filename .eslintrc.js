@@ -31,6 +31,7 @@ module.exports = {
 				prefer: "type-imports",
 				fixStyle: "inline-type-imports"
 			}
-		]
+		],
+		"@typescript-eslint/type-annotation-spacing": [ "error", { before: true, after: true }]
     }
 };
