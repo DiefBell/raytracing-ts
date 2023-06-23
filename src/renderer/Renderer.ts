@@ -7,15 +7,9 @@ import * as path from "path";
 import { Worker } from "worker_threads";
 import { type IRayTraceBatch } from "./IRayTraceBatch";
 import { type Scene } from "../scene/Scene";
+import { type IWorkerData } from "./IWorkerData";
 
-export interface IWorkerData
-{
-	imageBuffer : SharedArrayBuffer;
-	cameraRaysBuffer : SharedArrayBuffer;
-	sceneObjectsBuffer : SharedArrayBuffer;
-}
-
-const workerFile = path.join(__dirname, "./traceRay.js");
+const workerFile = path.join(__dirname, "worker", "index.js");
 export class Renderer implements IRenderer
 {
     private _finalImage : RawImageData;
@@ -44,7 +38,9 @@ export class Renderer implements IRenderer
 		const workerData : IWorkerData = {
 			imageBuffer: this._finalImage.rawDataBuffer,
 			cameraRaysBuffer: this._camera.rayDirectionsBuffer,
-			sceneObjectsBuffer: this._scene.sceneObjectBuffer
+			cameraPosition: this._camera.position,
+			sceneObjectsBuffer: this._scene.sceneObjectBuffer,
+			sceneBgColour: this._scene.backgroundColour
 		};
 
 		for(let i = 0; i < this._workers.length; i++)
@@ -100,12 +96,11 @@ export class Renderer implements IRenderer
 
 			return new Promise<void>((resolve) =>
 			{
-				const workerData : IRayTraceBatch = {
+				const batchData : IRayTraceBatch = {
 					minIndex,
-					maxIndex,
-					cameraPos: this._camera.position
+					maxIndex
 				};
-				worker.postMessage(workerData);
+				worker.postMessage(batchData);
 
 				const finish = (msg : unknown) =>
 				{

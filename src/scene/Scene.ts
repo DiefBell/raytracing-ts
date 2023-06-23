@@ -1,21 +1,47 @@
+import { type Rgba255 } from "../colour/colour";
+import { type IReadonlyScene } from "./IReadonlyScene";
+import { type IReadonlySphere } from "./IReadonlySphere";
+import { type IScene } from "./IScene";
+import { type ISphere } from "./ISphere";
 import { Sphere } from "./Sphere";
 import { EventEmitter } from "eventemitter3";
 
-export class Scene extends EventEmitter
+export class Scene extends EventEmitter implements IScene
 {
-	private _spheres : Sphere[];
-	public get spheres() : ReadonlyArray<Sphere> { return this._spheres; }
+	private _spheres : ISphere[];
+	public get spheres() : ReadonlyArray<ISphere> { return this._spheres; }
+
+	private _backgroundColour : Rgba255;
+	public get backgroundColour() { return this._backgroundColour; }
 
 	private _sceneObjectBuffer : SharedArrayBuffer;
 	public get sceneObjectBuffer() { return this._sceneObjectBuffer; }
 	private _sceneObjects : Float64Array;
 	
-	constructor(spheres : Sphere[])
+	constructor(spheres : Sphere[], bgColour : Rgba255)
 	{
 		super();
 
+		this._backgroundColour = bgColour;
 		this._spheres = spheres;
 		this.rebuildSceneBuffer();
+	}
+
+	public static fromArrayReadonly(arr : Float64Array, backgroundColour : Rgba255) : IReadonlyScene
+	{
+		const spheres = new Array<IReadonlySphere>();
+		for(let i = 0; i < arr.length; i += Sphere.ELEMENTS_PER_SPHERE)
+		{
+			spheres.push(
+				Sphere.fromArrayReadonly(
+					arr.subarray( i, i + Sphere.ELEMENTS_PER_SPHERE)
+				)
+			);
+		}
+		return {
+			spheres,
+			backgroundColour
+		};
 	}
 
 	public addSphere(sphere : Sphere) : this
