@@ -1,11 +1,15 @@
 import { type Rgba255 } from "../colour/colour";
+import { type IReadonlyScene } from "./IReadonlyScene";
+import { type IReadonlySphere } from "./IReadonlySphere";
+import { type IScene } from "./IScene";
+import { type ISphere } from "./ISphere";
 import { Sphere } from "./Sphere";
 import { EventEmitter } from "eventemitter3";
 
-export class Scene extends EventEmitter
+export class Scene extends EventEmitter implements IScene
 {
-	private _spheres : Sphere[];
-	public get spheres() : ReadonlyArray<Sphere> { return this._spheres; }
+	private _spheres : ISphere[];
+	public get spheres() : ReadonlyArray<ISphere> { return this._spheres; }
 
 	private _backgroundColour : Rgba255;
 	public get backgroundColour() { return this._backgroundColour; }
@@ -14,29 +18,30 @@ export class Scene extends EventEmitter
 	public get sceneObjectBuffer() { return this._sceneObjectBuffer; }
 	private _sceneObjects : Float64Array;
 	
-	constructor(spheres : Sphere[] | Float64Array, bgColour : Rgba255)
+	constructor(spheres : Sphere[], bgColour : Rgba255)
 	{
 		super();
 
 		this._backgroundColour = bgColour;
+		this._spheres = spheres;
+		this.rebuildSceneBuffer();
+	}
 
-		if(Array.isArray(spheres))
+	public static fromArrayReadonly(arr : Float64Array, backgroundColour : Rgba255) : IReadonlyScene
+	{
+		const spheres = new Array<IReadonlySphere>();
+		for(let i = 0; i < arr.length; i += Sphere.ELEMENTS_PER_SPHERE)
 		{
-			this._spheres = spheres;
-			this.rebuildSceneBuffer();
+			spheres.push(
+				Sphere.fromArrayReadonly(
+					arr.subarray( i, i + Sphere.ELEMENTS_PER_SPHERE)
+				)
+			);
 		}
-		else
-		{
-			this._sceneObjects = spheres;
-			this._spheres = new Array<Sphere>();
-			for(let i = 0; i < spheres.length; i += Sphere.ELEMENTS_PER_SPHERE)
-			{
-				this._spheres.push(
-					// really assuming that spheres.length is a multiple of Sphere.ELEMENTS_PER_SPHERE
-					Sphere.fromArray(spheres.subarray(i, i + Sphere.ELEMENTS_PER_SPHERE))
-				);
-			}
-		}
+		return {
+			spheres,
+			backgroundColour
+		};
 	}
 
 	public addSphere(sphere : Sphere) : this

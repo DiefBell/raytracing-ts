@@ -1,13 +1,14 @@
 import { vector } from "glm-ts";
 import { $clampRgba255, ELEMENTS_PER_RGBA, type Rgb255, type Rgba255 } from "../../colour/colour";
 import { Scene } from "../../scene/Scene";
+import { type IReadonlyScene } from "../../scene/IReadonlyScene";
 
 export class RayTraceWorker
 {
     private _image : Uint8ClampedArray;
     private _cameraRayDirs : Float64Array;
     private _cameraPos : vector.Vec3;
-    private _scene : Scene;
+    private _scene : IReadonlyScene;
     
     constructor(
         imageBuffer : Uint8ClampedArray,
@@ -20,7 +21,7 @@ export class RayTraceWorker
         this._image = imageBuffer;
         this._cameraRayDirs = cameraRayDirsBuffer;
         this._cameraPos = cameraPosition;
-        this._scene = new Scene(sceneObjectsBuffer, sceneBgColour);
+        this._scene = Scene.fromArrayReadonly(sceneObjectsBuffer, sceneBgColour);
     }
 
     public traceRay(i : number)
