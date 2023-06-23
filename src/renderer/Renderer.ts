@@ -37,8 +37,6 @@ export class Renderer
     {
         const startTime = performance.now();
 
-        const data = new Array<Rgba255>(this._finalImage.width * this._finalImage.height * ELEMENTS_PER_RGBA);
-
         for(let y = 0; y < this._finalImage.height; y++)
         {
             for(let x = 0; x < this._finalImage.width; x++)
@@ -53,16 +51,13 @@ export class Renderer
                 coord[1] = (coord[1] * 2) -1; // -1 -> 1
 
                 const colour = this.perPixel(coord);
-                // this._finalImage.setDataValue(
-                //     colour,
-                //     index
-                // );
-                data[index] = colour;
+                this._finalImage.setDataValue(
+                    colour,
+                    index
+                );
             }
 
         }
-
-        this._finalImage.setData(data);
 
         const endTime = performance.now();
         return {
