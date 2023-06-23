@@ -1,18 +1,48 @@
-import { vector } from "glm-ts";
-import { ICamera } from "../camera/ICamera";
-import { $clampRgba255, Rgb255, Rgba255 } from "../colour/colour";
+import { type ICamera } from "../camera/ICamera";
 import { RawImageData } from "../rawImageData/RawImageData";
-import { IRay } from "./IRay";
-import { IRenderer } from "./IRenderer";
+import { type IRenderer } from "./IRenderer";
 import type { IRenderInfo } from "./IRenderInfo";
+import * as path from "path";
 
+import { Worker } from "worker_threads";
+import { type IWorkerData } from "./IWorkerData";
+
+const workerFile = path.join(__dirname, "./traceRay.js");
 export class Renderer implements IRenderer
 {
     private _finalImage : RawImageData;
+	private _workers: Worker[];
+	private _camera: ICamera;
 
-    constructor(initialWidth : number, initialHeight : number)
+    constructor(
+		initialWidth : number,
+		initialHeight : number,
+		numWorkers: number,
+		camera: ICamera
+	)
     {
         this._finalImage = new RawImageData(initialWidth, initialHeight);
+		this._camera = camera;
+		this._workers = new Array(numWorkers);
+		for(let i = 0; i < numWorkers; i++)
+		{
+			this._workers[i] = new Worker(workerFile, {
+				workerData: {
+					imageBuffer: this._finalImage.rawDataBuffer,
+					cameraRaysBuffer: this._camera.rayDirectionsBuffer
+				}
+			});
+
+			this._workers[i].on("exit", (code) => 
+			{
+				console.error(`Render worker ${i} exited with code ${code}`);
+			});
+
+			this._workers[i].on("message", (msg) => 
+			{
+				if(msg !== "DONE") console.log(msg);
+			});
+		}
     }
 
     public onResize(width : number, height : number) : void
@@ -28,79 +58,47 @@ export class Renderer implements IRenderer
         }
     }
 
-    public render(camera: ICamera) : IRenderInfo
+    public async render() : Promise<IRenderInfo>
     {
         const startTime = performance.now();
 
-        let ray: IRay;
+		const rowsPerWorker = Math.ceil(this._finalImage.height / this._workers.length);
 
-        for(let y = 0; y < this._finalImage.height; y++)
-        {
-            for(let x = 0; x < this._finalImage.width; x++)
-            {
-                const index = x + (y * this._finalImage.width);
+		const renders = this._workers.map((worker, i) =>
+		{
+			const yMin = rowsPerWorker * i;
+			const yMax = Math.min(yMin + rowsPerWorker, this._finalImage.height);
 
-                ray = {
-                    origin: camera.position,
-                    direction: camera.rayDirections[index]
-                    // direction: [ coord[0], coord[1], -1 ]
-                };
-                
-                const colour: Rgba255 = this._traceRay(ray);
-                $clampRgba255(colour);
+			const minIndex = yMin * this._finalImage.width;
+			const maxIndex = yMax * this._finalImage.width;
 
-                this._finalImage.setDataValue(
-                    colour,
-                    index
-                );
-            }
+			return new Promise<void>((resolve) =>
+			{
+				const workerData: IWorkerData = {
+					minIndex,
+					maxIndex,
+					cameraPos: this._camera.position
+				};
+				worker.postMessage(workerData);
 
-        }
+				const finish = (msg: unknown) =>
+				{
+					if(msg === "DONE")
+					{
+						resolve();
+						worker.removeListener("message", finish);
+					}
+				};
+
+				worker.on("message", finish);
+			});
+		});
+
+		await Promise.all(renders);
 
         return {
             time: performance.now() - startTime,
-            imageData: this._finalImage.getImageData()
+            imageData: this._finalImage.imageData
         };
-    }
-
-    private _traceRay(ray: IRay) : Rgba255
-    {
-        const SPHERE_COLOUR : Rgb255 = [ 255, 0, 255 ];
-        const BG_COLOUR : Rgba255 = [ 0, 0, 0, 255];
-        const sphereRadius = 0.5;
-
-        const a = vector.dot(ray.direction, ray.direction);
-        const b = 2 * vector.dot(ray.origin, ray.direction);
-        const c = vector.dot(ray.origin, ray.origin) - sphereRadius * sphereRadius;
-
-        const discriminant = (b * b) - (4 * a * c);
-        if(discriminant < 0)
-        {
-            return BG_COLOUR;
-        }
-
-        // const t0 = (-b + Math.sqrt(discriminant)) / (2 * a);
-        const t1 = (-b - Math.sqrt(discriminant)) / (2 * a);
-        const tClosest = t1;
-
-        const hitPoint = vector.add(
-            // full ray from ray origin to hit point
-            vector.scale(ray.direction, tClosest),
-            // add origin point to get absolute hit point location
-            ray.origin
-        ) as vector.Vector<3>;
-
-        const normal = vector.normalise(hitPoint);
-
-        const lightDir : vector.Vector3 = vector.normalise([ -1, -1, -1 ]);
-
-        const lightIntensity = Math.max(
-            0,
-            vector.dot(normal, vector.scale(lightDir, -1 )) // == cos(angle), which can go below 0
-        );
-
-        const colourRgb = vector.scale(SPHERE_COLOUR, lightIntensity) as Rgb255;
-
-        return [ ...colourRgb, 255];
     }
 }

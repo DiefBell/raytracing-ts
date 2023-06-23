@@ -1,12 +1,18 @@
-import { CanvasDisplay } from "@minecraftts/seraph";
+import { type CanvasDisplay } from "@minecraftts/seraph";
 import { Camera } from "./camera/Camera";
 import { constructCamera } from "./camera/ICamera";
 import { Renderer } from "./renderer/Renderer";
+import * as os from "os";
 
-export const renderLoop = (display : CanvasDisplay) =>
+
+const NUM_RENDER_THREADS =
+	// Math.floor(os.cpus().length / 2);
+	// 1;
+	// 2;
+	os.cpus().length - 1;
+
+export const renderLoop = async (display : CanvasDisplay) =>
 {
-    const renderer = new Renderer(display.getWidth(), display.getHeight());
-    
     let context = display.getGraphics();
 
     const camera = constructCamera(
@@ -19,6 +25,13 @@ export const renderLoop = (display : CanvasDisplay) =>
         0.1,
         100
     );
+	
+    const renderer = new Renderer(
+		display.getWidth(),
+		display.getHeight(),
+		NUM_RENDER_THREADS,
+		camera
+	);
 
     display.on(
         "resize",
@@ -44,7 +57,7 @@ export const renderLoop = (display : CanvasDisplay) =>
         const cameraUpdateTime = camera.update(renderLoopTime);
         console.log(`\nCamera updated in \x1b[1m\x1b[34m${ cameraUpdateTime.toFixed(2) } ms\x1b[0m.`);
 
-        const render = renderer.render(camera);
+        const render = await renderer.render();
         console.info(`Render completed in \x1b[1m\x1b[32m${ render.time.toFixed(2) } ms\x1b[0m.`);
 
         context.putImageData(render.imageData, 0, 0);

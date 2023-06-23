@@ -1,8 +1,8 @@
 import { glm_utils, matrix, quaternion, vector } from 'glm-ts';
 
-import { Keyboard, Mouse } from '@minecraftts/seraph';
+import { type Keyboard, type Mouse } from '@minecraftts/seraph';
 
-import { ICamera } from './ICamera';
+import { type ICamera } from './ICamera';
 
 enum EKeycode
 {
@@ -20,6 +20,8 @@ enum EMouseButton
     LEFT_CLICK = 0
 }
 
+const ELEMENTS_PER_RAY_DIR = 3;
+
 export class Camera implements ICamera
 {
     private _direction: vector.Vector3;
@@ -32,7 +34,7 @@ export class Camera implements ICamera
     private _mouse: Mouse;
     private _lastMousePosition: vector.Vector2;
 
-    private _strafeSpeed = 0.0005;
+    private _strafeSpeed = 0.001;
     public get strafeSpeed() { return this._strafeSpeed; }
 
     private _rotationSpeed = 0.3;
@@ -51,8 +53,9 @@ export class Camera implements ICamera
     private _nearClip: number;
     private _farClip: number;
 
-    private _rayDirections: vector.Vector3[] = [];
-    public get rayDirections() { return this._rayDirections; }
+    private _rayDirectionsBuffer: SharedArrayBuffer;
+    public get rayDirectionsBuffer() { return this._rayDirectionsBuffer; }
+	private _rayDirections: Float64Array;
 
     constructor(
         viewportWidth: number,
@@ -85,6 +88,14 @@ export class Camera implements ICamera
         };
         this._nearClip = nearClip;
         this._farClip = farClip;
+		
+        this._rayDirectionsBuffer = new SharedArrayBuffer(
+			this._viewportWidth *
+			this._viewportHeight *
+			ELEMENTS_PER_RAY_DIR *
+			Float64Array.BYTES_PER_ELEMENT
+		);
+		this._rayDirections = new Float64Array(this._rayDirectionsBuffer);
 
         this._recalculateProjection();
         this._recalculateRayDirections();
@@ -119,6 +130,14 @@ export class Camera implements ICamera
             verticalRads: this._fov.verticalRads,
             aspectRatio: width / height
         };
+		
+        this._rayDirectionsBuffer = new SharedArrayBuffer(
+			this._viewportWidth *
+			this._viewportHeight *
+			ELEMENTS_PER_RAY_DIR *
+			Float64Array.BYTES_PER_ELEMENT
+		);
+		this._rayDirections = new Float64Array(this._rayDirectionsBuffer);
 
         this._recalculateProjection();
         this._recalculateRayDirections();
@@ -248,8 +267,6 @@ export class Camera implements ICamera
 
     private _recalculateRayDirections(): void
     {
-        this._rayDirections = new Array<vector.Vector3>(this._viewportWidth * this._viewportHeight);
-
         for(let y = 0; y < this._viewportHeight; y++)
         {
             // Canvas is indexed from top-left but
@@ -288,7 +305,9 @@ export class Camera implements ICamera
                 )
                 .slice(0, 3) as vector.Vector3;
 
-                this._rayDirections[ x + yInverted * this._viewportWidth] = rayDirection;
+                // this._rayDirections[ x + yInverted * this._viewportWidth] = rayDirection;
+				const index = x + yInverted * this._viewportWidth;
+				this._rayDirections.set(rayDirection, index * ELEMENTS_PER_RAY_DIR);
             }
         }
     }
