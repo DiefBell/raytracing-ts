@@ -1,4 +1,4 @@
-import { type Rgba255 } from "../colour/colour";
+import { type Rgb255 } from "../colour/colour";
 import { type IReadonlyScene } from "./IReadonlyScene";
 import { type IReadonlySphere } from "./IReadonlySphere";
 import { type IScene } from "./IScene";
@@ -11,14 +11,14 @@ export class Scene extends EventEmitter implements IScene
 	private _spheres : ISphere[];
 	public get spheres() : ReadonlyArray<ISphere> { return this._spheres; }
 
-	private _backgroundColour : Rgba255;
+	private _backgroundColour : Rgb255;
 	public get backgroundColour() { return this._backgroundColour; }
 
 	private _sceneObjectBuffer : SharedArrayBuffer;
 	public get sceneObjectBuffer() { return this._sceneObjectBuffer; }
 	private _sceneObjects : Float64Array;
 	
-	constructor(spheres : Sphere[], bgColour : Rgba255)
+	constructor(spheres : Sphere[], bgColour : Rgb255)
 	{
 		super();
 
@@ -27,7 +27,7 @@ export class Scene extends EventEmitter implements IScene
 		this.rebuildSceneBuffer();
 	}
 
-	public static fromArrayReadonly(arr : Float64Array, backgroundColour : Rgba255) : IReadonlyScene
+	public static fromArrayReadonly(arr : Float64Array, backgroundColour : Rgb255) : IReadonlyScene
 	{
 		const spheres = new Array<IReadonlySphere>();
 		for(let i = 0; i < arr.length; i += Sphere.ELEMENTS_PER_SPHERE)

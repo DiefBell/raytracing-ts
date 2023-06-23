@@ -31,17 +31,17 @@ export const renderLoop = async (display : CanvasDisplay) =>
     const scene = new Scene(
         [
             new Sphere(
-                [ -0.2, 0.15, 0.25 ],
-                0.4,
+                [ 0, -2.5, 0 ],
+                2.5,
                 [ 255, 0, 255 ]
             ),
             new Sphere(
-                [ 0.2, -0.1, 0.2 ],
+                [ 0.2, 0.25, -0.2 ],
                 0.25,
                 [ 0, 64, 244 ]
             ),
         ],
-        [ 32, 32, 32, 255 ]
+        [ 32, 32, 32 ]
     );
 	
     const renderer = new Renderer(
@@ -100,4 +100,6 @@ export const renderLoop = async (display : CanvasDisplay) =>
         const additionalLatency = renderLoopTime - render.time;
         console.log(`Additional \x1b[1m\x1b[33m${ additionalLatency.toFixed(2) } ms\x1b[0m of latency displaying to canvas.`);
     }
+
+    process.exit(0);
 };

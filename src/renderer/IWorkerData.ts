@@ -1,5 +1,5 @@
 import { type vector } from "glm-ts";
-import { type Rgba255 } from "../colour/colour";
+import { type Rgb255 } from "../colour/colour";
 
 
 export interface IWorkerData 
@@ -8,5 +8,5 @@ export interface IWorkerData
 	cameraRaysBuffer : SharedArrayBuffer;
 	cameraPosition : vector.Vec3;
 	sceneObjectsBuffer : SharedArrayBuffer;
-	sceneBgColour : Rgba255;
+	sceneBgColour : Rgb255;
 }

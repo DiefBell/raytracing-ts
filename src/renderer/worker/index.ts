@@ -32,7 +32,7 @@ const main = async () =>
 				{
 					for (let i = minIndex; i < maxIndex; i++)
 					{
-						rayTraceWorker.traceRay(i);
+						rayTraceWorker.perPixel(i);
 					}
 				}
 				catch (err)
