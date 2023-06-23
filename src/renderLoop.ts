@@ -28,18 +28,21 @@ export const renderLoop = async (display : CanvasDisplay) =>
         100
     );
 
-    const scene = new Scene([
-        new Sphere(
-            [ -0.2, 0.15, 0.25 ],
-            0.4,
-            [ 255, 0, 255 ]
-        ),
-        new Sphere(
-            [ 0.2, -0.1, 0.2 ],
-            0.25,
-            [ 0, 64, 244 ]
-        ),
-    ]);
+    const scene = new Scene(
+        [
+            new Sphere(
+                [ -0.2, 0.15, 0.25 ],
+                0.4,
+                [ 255, 0, 255 ]
+            ),
+            new Sphere(
+                [ 0.2, -0.1, 0.2 ],
+                0.25,
+                [ 0, 64, 244 ]
+            ),
+        ],
+        [ 32, 32, 32, 255 ]
+    );
 	
     const renderer = new Renderer(
 		display.getWidth(),
