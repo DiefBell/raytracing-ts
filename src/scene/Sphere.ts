@@ -1,5 +1,4 @@
 import { type vector } from "glm-ts";
-import { type Rgb255 } from "../colour/colour";
 import { type SphereArray } from "./SphereArray";
 import { type ISphere } from "./ISphere";
 import { type IReadonlySphere } from "./IReadonlySphere";
@@ -8,8 +7,8 @@ export class Sphere implements ISphere
 {
 	// position = 3 elements
 	// radius = 1 element
-	// albedo = 3
-	public static ELEMENTS_PER_SPHERE = 7;
+	// materialIndex = 1 element
+	public static ELEMENTS_PER_SPHERE = 5;
 	public static BYTES_PER_SPHERE = Float64Array.BYTES_PER_ELEMENT * Sphere.ELEMENTS_PER_SPHERE;
 
 	private _position : vector.Vec3;
@@ -18,15 +17,15 @@ export class Sphere implements ISphere
 	private _radius : number;
 	public get radius() { return this._radius; }
 
-	private _albedo : Rgb255;
-	public get albedo() { return this._albedo; }
+	private _materialIndex : number;
+	public get materialIndex() { return this._materialIndex; }
 
 	public toArray() : SphereArray 
 	{
 		return [
 			...this._position,
 			this._radius,
-			...this._albedo
+			this.materialIndex
 		] as SphereArray;
 	}
 
@@ -35,7 +34,7 @@ export class Sphere implements ISphere
 		return new Sphere(
 			[arr[0], arr[1], arr[2]],
 			arr[3],
-			[arr[4], arr[5], arr[6]]
+			arr[4]
 		);
 	}
 
@@ -44,18 +43,18 @@ export class Sphere implements ISphere
 		return {
 			position: [arr[0], arr[1], arr[2]],
 			radius: arr[3],
-			albedo: [arr[4], arr[5], arr[6]]
+			materialIndex: arr[4]
 		};
 	}
 
 	constructor(
 		position : vector.Vec3,
 		radius : number,
-		albedo : Rgb255
+		materialIndex : number
 	) 
 	{
 		this._position = position;
 		this._radius = radius;
-		this._albedo = albedo;
+		this._materialIndex = materialIndex;
 	}
 }
