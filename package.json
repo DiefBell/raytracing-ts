@@ -6,6 +6,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node ./build/index.js",
+    "start:profile": "node --prof ./build/index.js",
+    "process-profiles": "bash ./scripts/processProfileLogs.sh",
     "lint": "eslint ./src/**/*.ts",
     "lint:fix": "eslint ./src/**/*.ts --fix",
     "start:dev": "ts-node ./src/index.ts",
