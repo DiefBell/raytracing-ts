@@ -1,5 +1,5 @@
 /.vscode/settings.json
 /node_modules/
 build/*
-profiles/*.log.txt
+*.0x
 isolate-*.log
