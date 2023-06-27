@@ -66,7 +66,7 @@ export const renderLoop = async (display : CanvasDisplay) =>
         "update",
         () =>
         {
-            renderer.onSceneUpdate();
+            renderer.resetWorkers();
         }
     );
 
@@ -91,8 +91,13 @@ export const renderLoop = async (display : CanvasDisplay) =>
     while(!display.shouldClose())
     {
         display.pollEvents();
-        const cameraUpdateTime = camera.update(renderLoopTime);
-        console.log(`\nCamera updated in \x1b[1m\x1b[34m${ cameraUpdateTime.toFixed(2) } ms\x1b[0m.`);
+        const { time: camUpdateTime, moved: camMoved } = camera.update(renderLoopTime);
+        console.log(`\nCamera updated in \x1b[1m\x1b[34m${ camUpdateTime.toFixed(2) } ms\x1b[0m.`);
+
+		if(camMoved)
+		{
+			renderer.resetFrameIndex();
+		}
 
         const render = await renderer.render();
         console.info(`Render completed in \x1b[1m\x1b[32m${ render.time.toFixed(2) } ms\x1b[0m.`);

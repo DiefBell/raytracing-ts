@@ -2,7 +2,7 @@ import { glm_utils, matrix, quaternion, vector } from 'glm-ts';
 
 import { type Keyboard, type Mouse } from '@minecraftts/seraph';
 
-import { type ICamera } from './ICamera';
+import { type ICameraUpdateResult, type ICamera } from './ICamera';
 
 enum EKeycode
 {
@@ -101,20 +101,25 @@ export class Camera implements ICamera
         this._recalculateRayDirections();
     }
 
-    public update(ts : number) : number
+    public update(ts : number) : ICameraUpdateResult
     {
         const start = performance.now();
 
         const keyboardMoved = this._updateKeyboard(ts);
         const mouseMoved = this._updateMouse();
 
-        if(keyboardMoved || mouseMoved)
+		const moved = keyboardMoved || mouseMoved;
+
+        if(moved)
         {
             this._recalculateProjection();
             this._recalculateRayDirections();
         }
 
-        return performance.now() - start;
+        return {
+			time: performance.now() - start,
+			moved
+		};
     }
 
     public onResize(width : number, height : number)

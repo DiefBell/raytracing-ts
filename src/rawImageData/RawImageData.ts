@@ -32,43 +32,31 @@ export class RawImageData implements IRawImageData
         this._width = width;
         this._height = height;
 
-		this._rawDataBuffer = new SharedArrayBuffer(
-			width * height * ELEMENTS_PER_RGBA * BYTES_PER_UINT8
-		);
-		this._imageData = new Uint8ClampedArray(this._rawDataBuffer);
+		this._rebuildBuffers();
+		
+		// white for first render
+		// Q: is this even needed???
 		this._imageData.fill(255);
-
-        // const imageBuffer = new ArrayBuffer(width * height * ELEMENTS_PER_RGBA * BYTES_PER_UINT8);
-        // this._data = new Uint8ClampedArray(imageBuffer);
-        // this._data.fill(1);
     }
 
-    // // this method is seriously bloody slow
-    // public setData(newData : Rgba255[]) : void
-    // {
-    //     this._data = Uint8ClampedArray.from(newData.flat());
-    // }
+	private _rebuildBuffers()
+	{
+		this._rawDataBuffer = new SharedArrayBuffer(
+			this._width * this._height * ELEMENTS_PER_RGBA * BYTES_PER_UINT8
+		);
+		this._imageData = new Uint8ClampedArray(this._rawDataBuffer);
 
-    // // this way is about 7x faster
-    // public setDataValue(newData : Rgba255, index : number) : void
-    // {
-    //     this._data.set(newData, index * 4);
-    // }
-
-    // public getImageData() : ImageData
-    // {
-    //     const imgData = new ImageData(this._data, this._width, this._height, { colorSpace: "srgb" });
-    //     // imgData.data.set()
-    //     return imgData;
-    // }
+	}
 
     public resize(width : number, height : number) : void
     {
-		this._rawDataBuffer = new SharedArrayBuffer(
-			width * height * ELEMENTS_PER_RGBA * BYTES_PER_UINT8
-		);
-		this._imageData = new Uint8ClampedArray(this._rawDataBuffer);
-        // const imageBuffer = new ArrayBuffer(width * height * ELEMENTS_PER_RGBA * BYTES_PER_UINT8);
-        // this._data = new Uint8ClampedArray(imageBuffer);
+		this._width = width;
+		this._height = height;
+		this._rebuildBuffers();
     }
+
+	public resetAccumulation() : void
+	{
+
+	}
 }
