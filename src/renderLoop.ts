@@ -44,8 +44,8 @@ export const renderLoop = async (display : CanvasDisplay) =>
             new Sphere(
                 [
                     0, // positive x
-                    0.5, // positive y
-                    0.2 // positive is towards camera
+                    1, // positive y
+                    0.4 // positive is towards camera
                 ],
                 1,
                 1

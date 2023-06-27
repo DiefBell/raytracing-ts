@@ -71,7 +71,11 @@ export class RayTraceWorker
                 break;
             }
 
-            const lightDir = vector.normalise([ -1, -1, -1 ]);
+            const lightDir = vector.normalise([
+				-1, // side
+				-1, // pitch
+				0.5
+			]);
             const lightIntensity = Math.max(
                 0,
                 vector.dot(
