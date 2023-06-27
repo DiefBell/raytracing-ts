@@ -73,7 +73,7 @@ export class Camera implements ICamera
         this._keyboard = keyboard;
         this._mouse = mouse;
 
-        this._position = [ 0, 0, 1 ];
+        this._position = [ 0, 0, 3 ];
         this._direction = [ 0, 0, -1 ];
 
         this._lastMousePosition = [

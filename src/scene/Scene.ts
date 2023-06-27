@@ -1,4 +1,5 @@
 import { type Rgb255 } from "../colour/colour";
+import { type IMaterial } from "./IMaterial";
 import { type IReadonlyScene } from "./IReadonlyScene";
 import { type IReadonlySphere } from "./IReadonlySphere";
 import { type IScene } from "./IScene";
@@ -82,4 +83,19 @@ export class Scene extends EventEmitter implements IScene
 
 		this.emit("update");
 	}
+
+	public static materials : Readonly<IMaterial>[] = [
+		// pink
+		{
+			albedo: [ 255, 0, 255 ],
+			roughness: 0,
+			metallic: 0
+		},
+		// blue
+		{
+			albedo: [ 51, 76,  255 ],
+			roughness: 0.1,
+			metallic: 0.025
+		}
+	];
 }

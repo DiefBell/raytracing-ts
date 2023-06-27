@@ -30,15 +30,25 @@ export const renderLoop = async (display : CanvasDisplay) =>
 
     const scene = new Scene(
         [
+            // pink "floor" sphere
             new Sphere(
-                [ 0, -2.5, 0 ],
-                2.5,
-                [ 255, 0, 255 ]
+                [
+                    0,
+                    -7,
+                    0
+                ],
+                7,
+                0
             ),
+            // blue floating sphere
             new Sphere(
-                [ 0.2, 0.25, -0.2 ],
-                0.25,
-                [ 0, 64, 244 ]
+                [
+                    0, // positive x
+                    0.5, // positive y
+                    0.2 // positive is towards camera
+                ],
+                1,
+                1
             ),
         ],
         [ 32, 32, 32 ]
