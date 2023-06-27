@@ -1,4 +1,4 @@
-import { ELEMENTS_PER_RGBA, Rgba255 } from "../colour/colour";
+import { ELEMENTS_PER_RGBA } from "../colour/colour";
 import { ImageData } from "canvas";
 import { type IRawImageData } from "./IRawImageData";
 
