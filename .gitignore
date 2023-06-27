@@ -3,3 +3,4 @@
 build/*
 *.0x
 isolate-*.log
+yarn-error.log
