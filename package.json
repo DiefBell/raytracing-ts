@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "@minecraftts/seraph": "^0.4.0",
-    "@types/jest": "^29.2.0",
-    "eventemitter3": "^5.0.1"
+    "@types/jest": "^29.2.0"
   }
 }
