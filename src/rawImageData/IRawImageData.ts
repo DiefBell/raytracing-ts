@@ -1,8 +1,6 @@
-import type { ImageData } from "canvas";
-
 export interface IRawImageData
 {
 	rawDataBuffer : SharedArrayBuffer;
-	imageData : ImageData;
+	imageData : Uint8ClampedArray;
     resize : (width : number, height : number) => void;
 }

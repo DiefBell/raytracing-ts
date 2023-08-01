@@ -146,7 +146,9 @@ export class Renderer implements IRenderer
 
         return {
             time: performance.now() - startTime,
-            imageData: this._finalImage.imageData
+            imageData: this._finalImage.imageData,
+			imageHeight: this._finalImage.height,
+			imageWidth: this._finalImage.width
         };
     }
 }

@@ -11,15 +11,15 @@ export class RawImageData implements IRawImageData
 	public get rawDataBuffer() { return this._rawDataBuffer; }
 
     private _imageData : Uint8ClampedArray;
-    public get imageData()
-	{
-		return new ImageData(
-			this._imageData,
-			this._width,
-			this._height,
-			{ colorSpace: "srgb" }
-		);
-	}
+    public get imageData() { return this._imageData; }
+	// {
+	// 	return new ImageData(
+	// 		this._imageData,
+	// 		this._width,
+	// 		this._height,
+	// 		{ colorSpace: "srgb" }
+	// 	);
+	// }
 
     private _width : number;
     public get width() { return this._width; }
