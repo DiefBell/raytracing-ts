@@ -39,22 +39,17 @@ const renderer = new Renderer(1280, 720, NUM_RENDER_THREADS, camera, scene);
 
 let totalTime = 0;
 const main = async() =>
-{
-	let cont = true;
-	process.on("SIGINT", () => { cont = false; });
-	
+{	
 	for(let i = 0; i <= NUM_RUNS; i++)
 	{
 		const render = await renderer.render();
 		console.info(`Render completed in \x1b[1m\x1b[32m${ render.time.toFixed(2) } ms\x1b[0m.`);
 
-        if(!cont) break;
-
         // don't count very first run
         if(i > 0) totalTime += render.time;
 	}
 
-    console.log(`\nCompleted ${NUM_RUNS} renders in an average of ${(totalTime/NUM_RUNS).toFixed(2)} ms.`)
-
+    console.log(`\nCompleted ${NUM_RUNS} renders in an average of \x1b[1m${(totalTime/NUM_RUNS).toFixed(2)} ms\x1b[0m.`)
+    process.exit(0);
 };
 main();
