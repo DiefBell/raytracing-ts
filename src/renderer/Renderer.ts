@@ -8,6 +8,7 @@ import { Worker } from "worker_threads";
 import { type IRayTraceBatch } from "./IRayTraceBatch";
 import { type Scene } from "../scene/Scene";
 import { type IWorkerData } from "./IWorkerData";
+import { ELEMENTS_PER_RGBA } from "../colour/colour";
 
 const workerFile = path.join(__dirname, "worker", "index.js");
 export class Renderer implements IRenderer
@@ -17,6 +18,9 @@ export class Renderer implements IRenderer
 	private _camera : ICamera;
 	private _scene : Scene;
 
+	private _accumulatedImageBuffer : SharedArrayBuffer;
+	private _frameIndex : number;
+
     constructor(
 		initialWidth : number,
 		initialHeight : number,
@@ -25,18 +29,25 @@ export class Renderer implements IRenderer
 		scene : Scene
 	)
     {
-        this._finalImage = new RawImageData(initialWidth, initialHeight);
 		this._camera = camera;
 		this._scene = scene;
 		this._workers = new Array(numWorkers);
 
-		this._rebuildWorkers();
+		this._rebuildImage(initialWidth, initialHeight);
+		this.resetFrameIndex();
+		this.resetWorkers();
     }
 
-	private _rebuildWorkers()
+	public resetFrameIndex()
+	{
+		this._frameIndex = 1;
+	}
+
+	public resetWorkers()
 	{
 		const workerData : IWorkerData = {
 			imageBuffer: this._finalImage.rawDataBuffer,
+			accumulatorBuffer: this._accumulatedImageBuffer,
 			cameraRaysBuffer: this._camera.rayDirectionsBuffer,
 			cameraPosition: this._camera.position,
 			sceneObjectsBuffer: this._scene.sceneObjectBuffer,
@@ -62,23 +73,37 @@ export class Renderer implements IRenderer
 		}
 	}
 
-	public onSceneUpdate() : void
-	{
-		this._rebuildWorkers();
-	}
-
     public onResize(width : number, height : number) : void
     {
-        if(this._finalImage !== null)
-        {
-            if(this._finalImage.width === width && this._finalImage.height === height) return;
-            this._finalImage.resize(width, height);
-        }
-        else
-        {
-            this._finalImage = new RawImageData(width, height);
-        }
+        this._rebuildImage(width, height);
+		this.resetWorkers();
+		this.resetFrameIndex();
     }
+
+	private _rebuildImage(width : number, height : number) : void
+	{
+		if(this._finalImage?.width === width && this._finalImage?.height === height) return;
+
+		if(this._finalImage === undefined)
+		{
+			this._finalImage = new RawImageData(width, height);
+		}
+		else
+		{
+			this._finalImage.resize(width, height);
+		}
+
+		if(this._accumulatedImageBuffer === undefined)
+		{
+			this._accumulatedImageBuffer = new SharedArrayBuffer(
+				this._finalImage.width
+				* this._finalImage.height
+				* ELEMENTS_PER_RGBA
+				* Float64Array.BYTES_PER_ELEMENT
+			);
+		}
+
+	}
 
     public async render() : Promise<IRenderInfo>
     {
@@ -98,7 +123,8 @@ export class Renderer implements IRenderer
 			{
 				const batchData : IRayTraceBatch = {
 					minIndex,
-					maxIndex
+					maxIndex,
+					frameIndex: this._frameIndex
 				};
 				worker.postMessage(batchData);
 
@@ -116,10 +142,13 @@ export class Renderer implements IRenderer
 		});
 
 		await Promise.all(renders);
+		this._frameIndex++;
 
         return {
             time: performance.now() - startTime,
-            imageData: this._finalImage.imageData
+            imageData: this._finalImage.imageData,
+			imageHeight: this._finalImage.height,
+			imageWidth: this._finalImage.width
         };
     }
 }

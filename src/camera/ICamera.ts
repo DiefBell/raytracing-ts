@@ -2,10 +2,16 @@ import { type Keyboard, type Mouse } from "@minecraftts/seraph";
 import { type vector } from "glm-ts";
 
 
+export interface ICameraUpdateResult
+{
+	time : number;
+	moved : boolean;
+}
+
 export interface ICamera
 {
-    // returns time to run in ms
-    update : (ts : number) => number;
+    // returns time to run in ms and whether or not the camera was moved
+    update : (ts : number) => ICameraUpdateResult;
     onResize : (width : number, height : number) => void;
 
     direction : vector.Vector3;

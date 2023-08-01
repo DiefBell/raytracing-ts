@@ -3,8 +3,8 @@ import { Camera } from "./camera/Camera";
 import { constructCamera } from "./camera/ICamera";
 import { Renderer } from "./renderer/Renderer";
 import * as os from "os";
-import { Scene } from "./scene/Scene";
-import { Sphere } from "./scene/Sphere";
+import { ImageData } from "canvas";
+import { mainScene } from "./prefabs/scenes";
 
 
 const NUM_RENDER_THREADS =
@@ -28,31 +28,7 @@ export const renderLoop = async (display : CanvasDisplay) =>
         100
     );
 
-    const scene = new Scene(
-        [
-            // pink "floor" sphere
-            new Sphere(
-                [
-                    0,
-                    -7,
-                    0
-                ],
-                7,
-                0
-            ),
-            // blue floating sphere
-            new Sphere(
-                [
-                    0, // positive x
-                    0.5, // positive y
-                    0.2 // positive is towards camera
-                ],
-                1,
-                1
-            ),
-        ],
-        [ 32, 32, 32 ]
-    );
+    const scene = mainScene;
 	
     const renderer = new Renderer(
 		display.getWidth(),
@@ -66,7 +42,7 @@ export const renderLoop = async (display : CanvasDisplay) =>
         "update",
         () =>
         {
-            renderer.onSceneUpdate();
+            renderer.resetWorkers();
         }
     );
 
@@ -91,13 +67,22 @@ export const renderLoop = async (display : CanvasDisplay) =>
     while(!display.shouldClose())
     {
         display.pollEvents();
-        const cameraUpdateTime = camera.update(renderLoopTime);
-        console.log(`\nCamera updated in \x1b[1m\x1b[34m${ cameraUpdateTime.toFixed(2) } ms\x1b[0m.`);
+        const { time: camUpdateTime, moved: camMoved } = camera.update(renderLoopTime);
+        console.log(`\nCamera updated in \x1b[1m\x1b[34m${ camUpdateTime.toFixed(2) } ms\x1b[0m.`);
+
+		if(camMoved)
+		{
+			renderer.resetFrameIndex();
+		}
 
         const render = await renderer.render();
         console.info(`Render completed in \x1b[1m\x1b[32m${ render.time.toFixed(2) } ms\x1b[0m.`);
 
-        context.putImageData(render.imageData, 0, 0);
+        context.putImageData(
+            new ImageData(render.imageData, render.imageWidth, render.imageWidth),
+            0,
+            0
+        );
 
         // swap buffers so what we just drew is visible on the screen
         display.swapBuffers();

@@ -6,6 +6,7 @@ import { type IWorkerData } from "../IWorkerData";
 
 const {
 	imageBuffer,
+	accumulatorBuffer,
 	cameraRaysBuffer,
 	cameraPosition,
 	sceneObjectsBuffer,
@@ -16,6 +17,7 @@ const main = async () =>
 {
 	const rayTraceWorker = new RayTraceWorker(
 		new Uint8ClampedArray(imageBuffer),
+		new Float64Array(accumulatorBuffer),
 		new Float64Array(cameraRaysBuffer),
 		cameraPosition,
 		new Float64Array(sceneObjectsBuffer),
@@ -26,13 +28,13 @@ const main = async () =>
 	{
 		parentPort?.on(
 			"message",
-			({ minIndex, maxIndex } : IRayTraceBatch) =>
+			({ minIndex, maxIndex, frameIndex } : IRayTraceBatch) =>
 			{
 				try
 				{
 					for (let i = minIndex; i < maxIndex; i++)
 					{
-						rayTraceWorker.perPixel(i);
+						rayTraceWorker.perPixel(i, frameIndex);
 					}
 				}
 				catch (err)

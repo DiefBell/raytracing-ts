@@ -1,9 +1,9 @@
-import type { ImageData } from "canvas";
-
 export interface IRenderInfo
 {
     // Render time in ms
     time : number;
 
-    imageData : ImageData;
+    imageData : Uint8ClampedArray;
+    imageHeight : number;
+    imageWidth : number;
 }

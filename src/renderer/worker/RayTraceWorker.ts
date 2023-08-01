@@ -16,12 +16,14 @@ interface HitPayload
 export class RayTraceWorker
 {
     private _image : Uint8ClampedArray;
+	private _accumulator : Float64Array;
     private _cameraRayDirs : Float64Array;
     private _cameraPos : vector.Vec3;
     private _scene : IReadonlyScene;
     
     constructor(
         imageBuffer : Uint8ClampedArray,
+		accumulatorBuffer : Float64Array,
         cameraRayDirsBuffer : Float64Array,
         cameraPosition : vector.Vec3,
         sceneObjectsBuffer : Float64Array,
@@ -29,12 +31,13 @@ export class RayTraceWorker
     )
     {
         this._image = imageBuffer;
+		this._accumulator = accumulatorBuffer;
         this._cameraRayDirs = cameraRayDirsBuffer;
         this._cameraPos = cameraPosition;
         this._scene = Scene.fromArrayReadonly(sceneObjectsBuffer, sceneBgColour);
     }
 
-    public perPixel(i : number)
+    public perPixel(i : number, frameIndex : number)
     {
         const rayIndex = i * vector.ELEMENTS_PER_VEC3;
         const cameraRayDir = this._cameraRayDirs.subarray(
@@ -71,7 +74,11 @@ export class RayTraceWorker
                 break;
             }
 
-            const lightDir = vector.normalise([ -1, -1, -1 ]);
+            const lightDir = vector.normalise([
+				-1, // side
+				-1, // pitch
+				0.5
+			]);
             const lightIntensity = Math.max(
                 0,
                 vector.dot(
@@ -114,16 +121,33 @@ export class RayTraceWorker
             );
         }
 
-        const colourRgba : Rgba255 = [
-            colour[0],
-            colour[1],
-            colour[2],
-            255
-        ];
-        $clampRgba255(colourRgba);
+		// index within accumulator array
+		const ai = i * ELEMENTS_PER_RGBA;
+		if(frameIndex === 1)
+		{
+			this._accumulator[ai] = colour[0];
+			this._accumulator[ai + 1] = colour[1];
+			this._accumulator[ai + 2] = colour[2];
+			this._accumulator[ai + 3] = 255;
+		}
+		else
+		{
+			this._accumulator[ai] += colour[0];
+			this._accumulator[ai + 1] += colour[1];
+			this._accumulator[ai + 2] += colour[2];
+			this._accumulator[ai + 3] += 255;
+		}
+
+		const finalColour : Rgba255 = [
+			this._accumulator[ai] / frameIndex,
+			this._accumulator[ai + 1] / frameIndex,
+			this._accumulator[ai + 2] / frameIndex,
+			this._accumulator[ai + 3] / frameIndex
+		];
+		$clampRgba255(finalColour);
 
         this._image.set(
-            colourRgba,
+            finalColour,
             i * ELEMENTS_PER_RGBA
         );
     }
